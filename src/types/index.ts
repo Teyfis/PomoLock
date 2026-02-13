@@ -29,6 +29,7 @@ export interface AppSettings extends TimerSettings {
     dashboardAccent: string
     locale: 'en' | 'pt-BR'
     showTimerInTitle: boolean
+    alarmRepeatCount: number
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -49,6 +50,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
     dashboardAccent: '#64748b',
     locale: 'en',
     showTimerInTitle: true,
+    alarmRepeatCount: 3,
 }
 
 // ==========================================

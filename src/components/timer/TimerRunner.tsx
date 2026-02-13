@@ -55,21 +55,29 @@ export function TimerRunner() {
                     const AudioContext = window.AudioContext || (window as any).webkitAudioContext
                     if (AudioContext) {
                         const ctx = new AudioContext()
-                        const osc = ctx.createOscillator()
-                        const gain = ctx.createGain()
+                        const now = ctx.currentTime
+                        const repeat = settings.alarmRepeatCount || 3
 
-                        osc.connect(gain)
-                        gain.connect(ctx.destination)
+                        // Schedule beeps
+                        for (let i = 0; i < repeat; i++) {
+                            const startTime = now + (i * 1.5) // 1.5s interval
 
-                        osc.type = 'sine'
-                        osc.frequency.setValueAtTime(880, ctx.currentTime)
-                        osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.5)
+                            const osc = ctx.createOscillator()
+                            const gain = ctx.createGain()
 
-                        gain.gain.setValueAtTime(settings.soundVolume, ctx.currentTime)
-                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5)
+                            osc.connect(gain)
+                            gain.connect(ctx.destination)
 
-                        osc.start(ctx.currentTime)
-                        osc.stop(ctx.currentTime + 0.5)
+                            osc.type = 'sine'
+                            osc.frequency.setValueAtTime(880, startTime)
+                            osc.frequency.exponentialRampToValueAtTime(440, startTime + 0.5)
+
+                            gain.gain.setValueAtTime(settings.soundVolume, startTime)
+                            gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.5)
+
+                            osc.start(startTime)
+                            osc.stop(startTime + 0.5)
+                        }
                     }
                 } catch (e) {
                     console.error("Audio playback failed", e)

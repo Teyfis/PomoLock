@@ -28,8 +28,12 @@ export function SettingsDialog() {
         setOpen(isOpen)
     }
 
-    const handleSave = () => {
-        updateSettings(draft)
+    const update = (newSettings: AppSettings) => {
+        setDraft(newSettings)
+        updateSettings(newSettings)
+    }
+
+    const handleClose = () => {
         setOpen(false)
     }
 
@@ -63,7 +67,7 @@ export function SettingsDialog() {
                                     max={120}
                                     value={draft.focusDuration}
                                     onChange={(e) =>
-                                        setDraft({ ...draft, focusDuration: +e.target.value || 1 })
+                                        update({ ...draft, focusDuration: +e.target.value || 1 })
                                     }
                                     className="bg-zinc-800 border-zinc-700 text-white h-9 text-center"
                                 />
@@ -76,7 +80,7 @@ export function SettingsDialog() {
                                     max={60}
                                     value={draft.shortBreakDuration}
                                     onChange={(e) =>
-                                        setDraft({
+                                        update({
                                             ...draft,
                                             shortBreakDuration: +e.target.value || 1,
                                         })
@@ -92,7 +96,7 @@ export function SettingsDialog() {
                                     max={60}
                                     value={draft.longBreakDuration}
                                     onChange={(e) =>
-                                        setDraft({
+                                        update({
                                             ...draft,
                                             longBreakDuration: +e.target.value || 1,
                                         })
@@ -111,7 +115,7 @@ export function SettingsDialog() {
                                 max={12}
                                 value={draft.pomodorosUntilLongBreak}
                                 onChange={(e) =>
-                                    setDraft({
+                                    update({
                                         ...draft,
                                         pomodorosUntilLongBreak: +e.target.value || 1,
                                     })
@@ -131,7 +135,7 @@ export function SettingsDialog() {
                             <Switch
                                 checked={draft.autoStartBreaks}
                                 onCheckedChange={(v) =>
-                                    setDraft({ ...draft, autoStartBreaks: v })
+                                    update({ ...draft, autoStartBreaks: v })
                                 }
                             />
                         </div>
@@ -140,7 +144,7 @@ export function SettingsDialog() {
                             <Switch
                                 checked={draft.autoStartPomodoros}
                                 onCheckedChange={(v) =>
-                                    setDraft({ ...draft, autoStartPomodoros: v })
+                                    update({ ...draft, autoStartPomodoros: v })
                                 }
                             />
                         </div>
@@ -156,19 +160,38 @@ export function SettingsDialog() {
                             <Switch
                                 checked={draft.soundEnabled}
                                 onCheckedChange={(v) =>
-                                    setDraft({ ...draft, soundEnabled: v })
+                                    update({ ...draft, soundEnabled: v })
                                 }
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <Label className="text-xs text-zinc-500">Volume</Label>
+                            <div className="flex items-center justify-between">
+                                <Label className="text-xs text-zinc-500">Volume</Label>
+                                <span className="text-xs text-zinc-500 tabular-nums">{Math.round(draft.soundVolume * 100)}%</span>
+                            </div>
                             <Slider
                                 min={0}
                                 max={100}
                                 step={5}
                                 value={[draft.soundVolume * 100]}
                                 onValueChange={([v]) =>
-                                    setDraft({ ...draft, soundVolume: v / 100 })
+                                    update({ ...draft, soundVolume: v / 100 })
+                                }
+                                className="w-full"
+                            />
+                        </div>
+                        <div className="space-y-1.5 pt-1">
+                            <div className="flex items-center justify-between">
+                                <Label className="text-xs text-zinc-500">Repeat Count</Label>
+                                <span className="text-xs text-zinc-500 tabular-nums">{draft.alarmRepeatCount ?? 3}x</span>
+                            </div>
+                            <Slider
+                                min={1}
+                                max={10}
+                                step={1}
+                                value={[draft.alarmRepeatCount ?? 3]}
+                                onValueChange={([v]) =>
+                                    update({ ...draft, alarmRepeatCount: v })
                                 }
                                 className="w-full"
                             />
@@ -185,7 +208,7 @@ export function SettingsDialog() {
                             <Switch
                                 checked={draft.showTimerInTitle ?? true}
                                 onCheckedChange={(v) =>
-                                    setDraft({ ...draft, showTimerInTitle: v })
+                                    update({ ...draft, showTimerInTitle: v })
                                 }
                             />
                         </div>
@@ -208,7 +231,7 @@ export function SettingsDialog() {
                                         type="color"
                                         value={draft.modeColors[key]}
                                         onChange={(e) =>
-                                            setDraft({
+                                            update({
                                                 ...draft,
                                                 modeColors: {
                                                     ...draft.modeColors,
@@ -228,7 +251,7 @@ export function SettingsDialog() {
                                     type="color"
                                     value={draft.dashboardAccent}
                                     onChange={(e) =>
-                                        setDraft({ ...draft, dashboardAccent: e.target.value })
+                                        update({ ...draft, dashboardAccent: e.target.value })
                                     }
                                     className="w-8 h-8 rounded-full border-0 cursor-pointer bg-transparent [&::-webkit-color-swatch]:rounded-full [&::-webkit-color-swatch-wrapper]:p-0.5 [&::-moz-color-swatch]:rounded-full"
                                 />
@@ -237,7 +260,7 @@ export function SettingsDialog() {
                             <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => setDraft({ ...draft, dashboardAccent: '#64748b' })}
+                                onClick={() => update({ ...draft, dashboardAccent: '#64748b' })}
                                 className="text-[10px] h-6 px-2 text-zinc-500 hover:text-zinc-300"
                             >
                                 Reset to Default
@@ -247,10 +270,10 @@ export function SettingsDialog() {
 
                     {/* Save */}
                     <Button
-                        onClick={handleSave}
+                        onClick={handleClose}
                         className="w-full bg-zinc-700 hover:bg-zinc-600 text-white"
                     >
-                        Save
+                        Close
                     </Button>
                 </div>
             </DialogContent>
