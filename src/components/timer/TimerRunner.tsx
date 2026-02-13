@@ -50,7 +50,11 @@ export function TimerRunner() {
         if (status === 'running' && secondsRemaining === 0) {
             const { settings, mode, hyperfocusEnabled, reset, enterHyperfocus } = useTimerStore.getState()
 
-            if (settings.soundEnabled) {
+            // Only play sound if NOT entering Hyperfocus automatically
+            // User request: "Quando o modo hyperfocus estiver ativado quero que o alarme nao toque."
+            const shouldPlaySound = settings.soundEnabled && !(mode === 'focus' && hyperfocusEnabled)
+
+            if (shouldPlaySound) {
                 try {
                     const AudioContext = window.AudioContext || (window as any).webkitAudioContext
                     if (AudioContext) {
