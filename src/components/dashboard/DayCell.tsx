@@ -7,15 +7,8 @@ interface DayCellProps {
     day: number | null // null for empty cells
     totalMinutes: number
     isToday?: boolean
+    intensityColors: string[]
 }
-
-const INTENSITY_COLORS = [
-    'bg-zinc-800/50',      // 0: no data
-    'bg-slate-700/80',     // 1: 0-4h
-    'bg-slate-600/90',     // 2: 4-7h
-    'bg-slate-500',        // 3: 7-10h
-    'bg-slate-400',        // 4: 10h+
-]
 
 function formatHoursMinutes(totalMinutes: number): string {
     if (totalMinutes === 0) return ''
@@ -24,25 +17,26 @@ function formatHoursMinutes(totalMinutes: number): string {
     return `${h}:${String(m).padStart(2, '0')}`
 }
 
-export function DayCell({ day, totalMinutes, isToday }: DayCellProps) {
+export function DayCell({ day, totalMinutes, isToday, intensityColors }: DayCellProps) {
     if (day === null) {
         return <div className="aspect-square" />
     }
 
     const intensity = getHeatmapIntensity(totalMinutes)
     const timeDisplay = formatHoursMinutes(totalMinutes)
+    const bgColor = intensity === 0 ? 'rgba(255,255,255,0.04)' : intensityColors[intensity]
 
     return (
         <div
             className={cn(
                 'aspect-square rounded-md flex flex-col items-center justify-center gap-0.5 transition-colors duration-200 text-center',
-                INTENSITY_COLORS[intensity],
                 isToday && 'ring-2 ring-white/50'
             )}
+            style={{ backgroundColor: bgColor }}
         >
             <span
                 className={cn(
-                    'text-xs font-medium',
+                    'text-xs font-medium tabular-nums',
                     intensity === 0 ? 'text-zinc-500' : 'text-white/90'
                 )}
             >

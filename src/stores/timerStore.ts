@@ -20,6 +20,7 @@ interface TimerState {
     completedPomodoros: number
     sessionStartedAt: string | null
     hyperfocusEnabled: boolean
+    pausedFromHyperfocus: boolean
 
     // Settings
     settings: AppSettings
@@ -84,6 +85,7 @@ export const useTimerStore = create<TimerState>()(
             completedPomodoros: 0,
             sessionStartedAt: null,
             hyperfocusEnabled: false,
+            pausedFromHyperfocus: false,
 
             // Settings
             settings: DEFAULT_SETTINGS,
@@ -101,18 +103,27 @@ export const useTimerStore = create<TimerState>()(
             },
 
             start: () => {
-                const { status, sessionStartedAt } = get()
-                set({
-                    status: 'running',
-                    sessionStartedAt:
-                        status === 'idle'
-                            ? new Date().toISOString()
-                            : sessionStartedAt,
-                })
+                const { status, sessionStartedAt, pausedFromHyperfocus } = get()
+                if (pausedFromHyperfocus) {
+                    // Resume hyperfocus counting
+                    set({ status: 'hyperfocus', pausedFromHyperfocus: false })
+                } else {
+                    set({
+                        status: 'running',
+                        sessionStartedAt:
+                            status === 'idle'
+                                ? new Date().toISOString()
+                                : sessionStartedAt,
+                    })
+                }
             },
 
             pause: () => {
-                set({ status: 'paused' })
+                const { status } = get()
+                set({
+                    status: 'paused',
+                    pausedFromHyperfocus: status === 'hyperfocus',
+                })
             },
 
             reset: () => {

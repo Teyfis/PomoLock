@@ -27,7 +27,7 @@ export function Timer() {
     const pomodoroText = completedPomodoros === 1 ? 'Pomodoro' : 'Pomodoros'
 
     return (
-        <div className="min-h-screen bg-[#1a1a2e] flex flex-col items-center pt-8 px-4">
+        <div className="min-h-screen bg-[#1A1B24] flex flex-col items-center pt-8 px-4">
             {/* Header */}
             <header className="w-full max-w-md flex items-center justify-between mb-8">
                 <h1
@@ -57,7 +57,7 @@ export function Timer() {
             <div className="w-full max-w-md flex items-center justify-between mb-10 px-1">
                 <div className="flex items-center gap-2 text-zinc-400 text-sm">
                     <Hourglass className="h-4 w-4" style={{ color: accentColor }} />
-                    <span className="font-medium">
+                    <span className="font-medium tabular-nums">
                         {completedPomodoros} {pomodoroText}
                     </span>
                 </div>

@@ -206,6 +206,17 @@ export function SettingsDialog() {
                                 </div>
                             ))}
                         </div>
+                        <div className="flex items-center gap-2 pt-1">
+                            <input
+                                type="color"
+                                value={draft.dashboardAccent}
+                                onChange={(e) =>
+                                    setDraft({ ...draft, dashboardAccent: e.target.value })
+                                }
+                                className="w-8 h-8 rounded-full border-0 cursor-pointer bg-transparent [&::-webkit-color-swatch]:rounded-full [&::-webkit-color-swatch-wrapper]:p-0.5 [&::-moz-color-swatch]:rounded-full"
+                            />
+                            <Label className="text-xs text-zinc-400">Dashboard</Label>
+                        </div>
                     </section>
 
                     {/* Save */}

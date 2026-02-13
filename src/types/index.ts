@@ -26,6 +26,7 @@ export interface ModeColors {
 
 export interface AppSettings extends TimerSettings {
     modeColors: ModeColors
+    dashboardAccent: string
     locale: 'en' | 'pt-BR'
 }
 
@@ -44,6 +45,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
         longBreak: '#397097',
         hyperfocus: '#8b5cf6',
     },
+    dashboardAccent: '#8b5cf6',
     locale: 'en',
 }
 

@@ -17,9 +17,9 @@ export function TimerDisplay({
     isRunning,
     onReset,
 }: TimerDisplayProps) {
-    // SVG circular progress
+    // SVG circular progress — thicker ring, animated
     const size = 280
-    const strokeWidth = 4
+    const strokeWidth = 6
     const radius = (size - strokeWidth) / 2
     const circumference = 2 * Math.PI * radius
     const offset = circumference * (1 - progress)
@@ -41,7 +41,7 @@ export function TimerDisplay({
                     strokeWidth={strokeWidth}
                     fill="none"
                 />
-                {/* Progress ring */}
+                {/* Progress ring — shrinks as time decreases */}
                 <circle
                     cx={size / 2}
                     cy={size / 2}
@@ -61,7 +61,7 @@ export function TimerDisplay({
                 <span className="text-6xl sm:text-7xl font-bold text-white font-mono tabular-nums tracking-tight">
                     {formattedTime}
                 </span>
-                <span className="text-sm text-zinc-400 font-medium" style={{ color: isRunning ? accentColor : undefined }}>
+                <span className="text-sm font-medium tabular-nums" style={{ color: isRunning ? accentColor : 'rgba(161,161,170,1)' }}>
                     {modeLabel}
                 </span>
                 {/* Reset icon */}

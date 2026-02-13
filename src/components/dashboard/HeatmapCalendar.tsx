@@ -7,16 +7,9 @@ import type { DayStats } from '@/types'
 
 const WEEK_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
-const LEGEND_ITEMS = [
-    { label: '0+', className: 'bg-zinc-800/50' },
-    { label: '4+', className: 'bg-slate-700/80' },
-    { label: '7+', className: 'bg-slate-600/90' },
-    { label: '10+', className: 'bg-slate-500' },
-    { label: '12+', className: 'bg-slate-400' },
-]
-
 interface HeatmapCalendarProps {
     sessions: DayStats[]
+    accentColor: string
 }
 
 function getCalendarGrid(year: number, month: number) {
@@ -44,7 +37,14 @@ function getCalendarGrid(year: number, month: number) {
     return grid
 }
 
-export function HeatmapCalendar({ sessions }: HeatmapCalendarProps) {
+function hexToRgba(hex: string, alpha: number): string {
+    const r = parseInt(hex.slice(1, 3), 16)
+    const g = parseInt(hex.slice(3, 5), 16)
+    const b = parseInt(hex.slice(5, 7), 16)
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`
+}
+
+export function HeatmapCalendar({ sessions, accentColor }: HeatmapCalendarProps) {
     const today = new Date()
     const [year, setYear] = useState(today.getFullYear())
     const [month, setMonth] = useState(today.getMonth())
@@ -98,6 +98,15 @@ export function HeatmapCalendar({ sessions }: HeatmapCalendarProps) {
         )
     }
 
+    // Generate intensity colors based on accent color
+    const intensityColors = useMemo(() => [
+        'transparent',
+        hexToRgba(accentColor, 0.2),
+        hexToRgba(accentColor, 0.4),
+        hexToRgba(accentColor, 0.65),
+        hexToRgba(accentColor, 0.9),
+    ], [accentColor])
+
     return (
         <div className="space-y-4">
             <MonthNavigator
@@ -128,20 +137,22 @@ export function HeatmapCalendar({ sessions }: HeatmapCalendarProps) {
                         day={day}
                         totalMinutes={day !== null ? (dayMap.get(day) ?? 0) : 0}
                         isToday={isToday(day)}
+                        intensityColors={intensityColors}
                     />
                 ))}
             </div>
 
             {/* Legend */}
             <div className="flex items-center gap-2 pt-2">
-                {LEGEND_ITEMS.map((item) => (
-                    <div key={item.label} className="flex items-center gap-1">
-                        <div className={`w-4 h-4 rounded-sm ${item.className}`} />
-                        <span className="text-[10px] text-zinc-500 font-mono">
-                            {item.label}
-                        </span>
-                    </div>
+                <span className="text-[10px] text-zinc-500">Less</span>
+                {intensityColors.map((color, i) => (
+                    <div
+                        key={i}
+                        className="w-4 h-4 rounded-sm"
+                        style={{ backgroundColor: i === 0 ? 'rgba(255,255,255,0.05)' : color }}
+                    />
                 ))}
+                <span className="text-[10px] text-zinc-500">More</span>
             </div>
         </div>
     )

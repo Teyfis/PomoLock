@@ -88,6 +88,7 @@ export function useTimer() {
     }, [start])
 
     const handlePause = useCallback(() => {
+        // Pause works for both running and hyperfocus — just pauses
         pause()
     }, [pause])
 
@@ -127,7 +128,7 @@ export function useTimer() {
     // Display time: in hyperfocus mode, show the counting-up time
     const displaySeconds = status === 'hyperfocus' ? hyperfocusSeconds : secondsRemaining
 
-    // Get current accent color
+    // Get current accent color — purple during hyperfocus
     const getAccentColor = useCallback(() => {
         if (status === 'hyperfocus') return settings.modeColors.hyperfocus
         return settings.modeColors[mode]
@@ -144,6 +145,7 @@ export function useTimer() {
     }, [mode, status])
 
     // Progress ratio for circular ring (1 = full, 0 = empty)
+    // Ring shrinks as seconds decrease
     const getProgress = useCallback(() => {
         if (status === 'hyperfocus') return 1 // Full ring during hyperfocus
         const total = (() => {
@@ -188,7 +190,6 @@ function playAlarm(volume: number) {
         const ctx = new AudioContext()
         const v = volume * 0.25
 
-        // Bell tone 1
         const playTone = (freq: number, startTime: number, duration: number) => {
             const osc = ctx.createOscillator()
             const gain = ctx.createGain()

@@ -18,7 +18,6 @@ export function ModeSelector({ accentColor }: ModeSelectorProps) {
     const mode = useTimerStore((s) => s.mode)
     const setMode = useTimerStore((s) => s.setMode)
     const reset = useTimerStore((s) => s.reset)
-    const status = useTimerStore((s) => s.status)
 
     const handleModeChange = (value: string) => {
         const newMode = value as TimerMode
@@ -32,12 +31,12 @@ export function ModeSelector({ accentColor }: ModeSelectorProps) {
 
     return (
         <Tabs value={mode} onValueChange={handleModeChange} className="w-full max-w-md mx-auto">
-            <TabsList className="grid w-full grid-cols-3 bg-zinc-800/60 h-11 rounded-full p-1">
+            <TabsList className="grid w-full grid-cols-3 bg-zinc-800/60 h-11 rounded-lg p-1 gap-1">
                 {MODES.map((m) => (
                     <TabsTrigger
                         key={m.value}
                         value={m.value}
-                        className="rounded-full text-sm font-semibold text-zinc-400 data-[state=active]:text-white data-[state=active]:shadow-none transition-all duration-200"
+                        className="rounded-md text-sm font-semibold text-zinc-400 data-[state=active]:text-white data-[state=active]:shadow-none transition-all duration-200"
                         style={
                             m.value === mode
                                 ? { backgroundColor: accentColor, color: 'white' }

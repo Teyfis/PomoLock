@@ -13,6 +13,7 @@ describe('Timer Store', () => {
             completedPomodoros: 0,
             sessionStartedAt: null,
             hyperfocusEnabled: false,
+            pausedFromHyperfocus: false,
             settings: DEFAULT_SETTINGS,
         })
     })
@@ -169,6 +170,24 @@ describe('Timer Store', () => {
             expect(state.status).toBe('idle')
             expect(state.completedPomodoros).toBe(1)
             expect(state.hyperfocusSeconds).toBe(0)
+        })
+
+        it('should pause and resume during hyperfocus without resetting', () => {
+            useTimerStore.getState().enterHyperfocus()
+            useTimerStore.getState().tickHyperfocus()
+            useTimerStore.getState().tickHyperfocus()
+            expect(useTimerStore.getState().hyperfocusSeconds).toBe(2)
+
+            // Pause during hyperfocus
+            useTimerStore.getState().pause()
+            expect(useTimerStore.getState().status).toBe('paused')
+            expect(useTimerStore.getState().pausedFromHyperfocus).toBe(true)
+            expect(useTimerStore.getState().hyperfocusSeconds).toBe(2) // preserved
+
+            // Resume — should go back to hyperfocus, not running
+            useTimerStore.getState().start()
+            expect(useTimerStore.getState().status).toBe('hyperfocus')
+            expect(useTimerStore.getState().hyperfocusSeconds).toBe(2) // still preserved
         })
     })
 
