@@ -6,6 +6,7 @@ interface TimerDisplayProps {
     progress: number
     accentColor: string
     isRunning: boolean
+    isHyperfocus: boolean
     onReset: () => void
 }
 
@@ -15,11 +16,12 @@ export function TimerDisplay({
     progress,
     accentColor,
     isRunning,
+    isHyperfocus,
     onReset,
 }: TimerDisplayProps) {
-    // SVG circular progress — thicker ring, animated
+    // SVG circular progress — thicker ring during hyperfocus
     const size = 280
-    const strokeWidth = 6
+    const strokeWidth = isHyperfocus ? 10 : 6
     const radius = (size - strokeWidth) / 2
     const circumference = 2 * Math.PI * radius
     const offset = circumference * (1 - progress)
@@ -58,7 +60,7 @@ export function TimerDisplay({
 
             {/* Center content */}
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-1">
-                <span className="text-6xl sm:text-7xl font-bold text-white font-mono tabular-nums tracking-tight">
+                <span className="text-6xl sm:text-7xl font-bold text-white tabular-nums tracking-tight">
                     {formattedTime}
                 </span>
                 <span className="text-sm font-medium tabular-nums" style={{ color: isRunning ? accentColor : 'rgba(161,161,170,1)' }}>

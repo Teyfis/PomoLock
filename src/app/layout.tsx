@@ -1,15 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { B612_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const b612Mono = B612_Mono({
+  variable: "--font-b612-mono",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
@@ -26,7 +22,8 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#1A1B24]`}
+        className={`${b612Mono.variable} antialiased bg-[#1A1B24]`}
+        style={{ fontFamily: 'var(--font-b612-mono), monospace' }}
       >
         {children}
       </body>

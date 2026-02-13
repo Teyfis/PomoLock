@@ -99,6 +99,7 @@ export const useTimerStore = create<TimerState>()(
                     secondsRemaining: getDurationForMode(mode, settings),
                     hyperfocusSeconds: 0,
                     sessionStartedAt: null,
+                    pausedFromHyperfocus: false,
                 })
             },
 
@@ -133,6 +134,7 @@ export const useTimerStore = create<TimerState>()(
                     secondsRemaining: getDurationForMode(mode, settings),
                     hyperfocusSeconds: 0,
                     sessionStartedAt: null,
+                    pausedFromHyperfocus: false,
                 })
             },
 
@@ -149,6 +151,7 @@ export const useTimerStore = create<TimerState>()(
                     hyperfocusSeconds: 0,
                     completedPomodoros: newPomodoros,
                     sessionStartedAt: null,
+                    pausedFromHyperfocus: false,
                 })
             },
 
@@ -180,6 +183,7 @@ export const useTimerStore = create<TimerState>()(
                     hyperfocusSeconds: 0,
                     completedPomodoros: newPomodoros,
                     sessionStartedAt: null,
+                    pausedFromHyperfocus: false,
                 })
             },
 
@@ -207,11 +211,35 @@ export const useTimerStore = create<TimerState>()(
         }),
         {
             name: 'pomodoro-timer-storage',
+            // Persist timer state so navigation doesn't reset the timer
             partialize: (state) => ({
                 settings: state.settings,
                 completedPomodoros: state.completedPomodoros,
                 hyperfocusEnabled: state.hyperfocusEnabled,
+                mode: state.mode,
+                status: state.status,
+                secondsRemaining: state.secondsRemaining,
+                hyperfocusSeconds: state.hyperfocusSeconds,
+                pausedFromHyperfocus: state.pausedFromHyperfocus,
             }),
+            // Deep merge to handle new settings fields (e.g. dashboardAccent)
+            merge: (persisted, current) => {
+                const p = persisted as Partial<TimerState> | undefined
+                if (!p) return current
+                const merged = { ...current, ...p }
+                // Deep merge settings so new defaults aren't lost
+                if (p.settings) {
+                    merged.settings = {
+                        ...current.settings,
+                        ...p.settings,
+                        modeColors: {
+                            ...current.settings.modeColors,
+                            ...(p.settings.modeColors ?? {}),
+                        },
+                    }
+                }
+                return merged
+            },
         }
     )
 )

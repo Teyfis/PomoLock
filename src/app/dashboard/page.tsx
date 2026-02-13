@@ -24,7 +24,7 @@ const MOCK_SESSIONS: DayStats[] = [
 ]
 
 export default function DashboardPage() {
-    const dashboardAccent = useTimerStore((s) => s.settings.dashboardAccent)
+    const dashboardAccent = useTimerStore((s) => s.settings.dashboardAccent) || '#8b5cf6'
 
     return (
         <div className="min-h-screen bg-[#1A1B24] pt-8 px-4 pb-8">

@@ -41,7 +41,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
     soundVolume: 0.5,
     modeColors: {
         focus: '#e74c6f',
-        shortBreak: '#38858a',
+        shortBreak: '#1fcf81',
         longBreak: '#397097',
         hyperfocus: '#8b5cf6',
     },

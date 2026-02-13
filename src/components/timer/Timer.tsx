@@ -78,6 +78,7 @@ export function Timer() {
                     progress={progress}
                     accentColor={accentColor}
                     isRunning={status === 'running' || status === 'hyperfocus'}
+                    isHyperfocus={status === 'hyperfocus'}
                     onReset={reset}
                 />
             </div>

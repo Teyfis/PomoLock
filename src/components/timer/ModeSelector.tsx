@@ -1,7 +1,6 @@
 'use client'
 
 import { useTimerStore } from '@/stores/timerStore'
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import type { TimerMode } from '@/types'
 
 const MODES: { value: TimerMode; label: string }[] = [
@@ -19,24 +18,24 @@ export function ModeSelector({ accentColor }: ModeSelectorProps) {
     const setMode = useTimerStore((s) => s.setMode)
     const reset = useTimerStore((s) => s.reset)
 
-    const handleModeChange = (value: string) => {
-        const newMode = value as TimerMode
-        if (newMode === mode) {
+    const handleClick = (value: TimerMode) => {
+        if (value === mode) {
             // Clicking current tab resets the timer
             reset()
         } else {
-            setMode(newMode)
+            // Switching mode — setMode already resets to that mode's duration
+            setMode(value)
         }
     }
 
     return (
-        <Tabs value={mode} onValueChange={handleModeChange} className="w-full max-w-md mx-auto">
-            <TabsList className="grid w-full grid-cols-3 bg-zinc-800/60 h-11 rounded-lg p-1 gap-1">
+        <div className="w-full max-w-md mx-auto">
+            <div className="grid grid-cols-3 bg-zinc-800/60 rounded-lg p-1 gap-1">
                 {MODES.map((m) => (
-                    <TabsTrigger
+                    <button
                         key={m.value}
-                        value={m.value}
-                        className="rounded-md text-sm font-semibold text-zinc-400 data-[state=active]:text-white data-[state=active]:shadow-none transition-all duration-200"
+                        onClick={() => handleClick(m.value)}
+                        className="rounded-md text-sm font-semibold py-2 transition-all duration-200 text-zinc-400 hover:text-zinc-200"
                         style={
                             m.value === mode
                                 ? { backgroundColor: accentColor, color: 'white' }
@@ -44,9 +43,9 @@ export function ModeSelector({ accentColor }: ModeSelectorProps) {
                         }
                     >
                         {m.label}
-                    </TabsTrigger>
+                    </button>
                 ))}
-            </TabsList>
-        </Tabs>
+            </div>
+        </div>
     )
 }
