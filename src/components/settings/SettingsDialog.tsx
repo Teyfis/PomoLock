@@ -10,11 +10,11 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { Slider } from '@/components/ui/slider'
 import { Settings } from 'lucide-react'
 import { useTimerStore } from '@/stores/timerStore'
-import { DurationPicker } from './DurationPicker'
 import type { AppSettings } from '@/types'
 
 export function SettingsDialog() {
@@ -49,45 +49,74 @@ export function SettingsDialog() {
                 </DialogHeader>
 
                 <div className="space-y-6 pb-2">
-                    {/* Timer Durations — DurationPicker */}
+                    {/* Timer Durations */}
                     <section className="space-y-3">
                         <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider">
-                            Timer
+                            Timer (minutes)
                         </h3>
-                        <div className="flex justify-around">
-                            <DurationPicker
-                                label="Pomodoro"
-                                value={draft.focusDuration}
-                                onChange={(v) => setDraft({ ...draft, focusDuration: v })}
-                                min={1}
-                                max={120}
-                            />
-                            <DurationPicker
-                                label="Short Break"
-                                value={draft.shortBreakDuration}
-                                onChange={(v) => setDraft({ ...draft, shortBreakDuration: v })}
-                                min={1}
-                                max={60}
-                            />
-                            <DurationPicker
-                                label="Long Break"
-                                value={draft.longBreakDuration}
-                                onChange={(v) => setDraft({ ...draft, longBreakDuration: v })}
-                                min={1}
-                                max={60}
-                            />
+                        <div className="grid grid-cols-3 gap-3">
+                            <div>
+                                <Label className="text-xs text-zinc-500">Pomodoro</Label>
+                                <Input
+                                    type="number"
+                                    min={1}
+                                    max={120}
+                                    value={draft.focusDuration}
+                                    onChange={(e) =>
+                                        setDraft({ ...draft, focusDuration: +e.target.value || 1 })
+                                    }
+                                    className="bg-zinc-800 border-zinc-700 text-white h-9 text-center"
+                                />
+                            </div>
+                            <div>
+                                <Label className="text-xs text-zinc-500">Short Break</Label>
+                                <Input
+                                    type="number"
+                                    min={1}
+                                    max={60}
+                                    value={draft.shortBreakDuration}
+                                    onChange={(e) =>
+                                        setDraft({
+                                            ...draft,
+                                            shortBreakDuration: +e.target.value || 1,
+                                        })
+                                    }
+                                    className="bg-zinc-800 border-zinc-700 text-white h-9 text-center"
+                                />
+                            </div>
+                            <div>
+                                <Label className="text-xs text-zinc-500">Long Break</Label>
+                                <Input
+                                    type="number"
+                                    min={1}
+                                    max={60}
+                                    value={draft.longBreakDuration}
+                                    onChange={(e) =>
+                                        setDraft({
+                                            ...draft,
+                                            longBreakDuration: +e.target.value || 1,
+                                        })
+                                    }
+                                    className="bg-zinc-800 border-zinc-700 text-white h-9 text-center"
+                                />
+                            </div>
                         </div>
-                        <div className="flex items-center gap-3 pt-1">
+                        <div>
                             <Label className="text-xs text-zinc-500">
                                 Pomodoros until long break
                             </Label>
-                            <DurationPicker
-                                label=""
-                                value={draft.pomodorosUntilLongBreak}
-                                onChange={(v) => setDraft({ ...draft, pomodorosUntilLongBreak: v })}
+                            <Input
+                                type="number"
                                 min={1}
                                 max={12}
-                                unit=""
+                                value={draft.pomodorosUntilLongBreak}
+                                onChange={(e) =>
+                                    setDraft({
+                                        ...draft,
+                                        pomodorosUntilLongBreak: +e.target.value || 1,
+                                    })
+                                }
+                                className="bg-zinc-800 border-zinc-700 text-white h-9 w-20 text-center"
                             />
                         </div>
                     </section>

@@ -60,7 +60,7 @@ export function TimerDisplay({
 
             {/* Center content */}
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-1">
-                <span className="text-6xl sm:text-7xl font-bold text-white tabular-nums tracking-tight">
+                <span className="text-6xl sm:text-7xl font-bold text-white tabular-nums tracking-tight" style={{ fontFamily: 'var(--font-rubik)' }}>
                     {formattedTime}
                 </span>
                 <span className="text-sm font-medium tabular-nums" style={{ color: isRunning ? accentColor : 'rgba(161,161,170,1)' }}>
