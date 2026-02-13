@@ -193,13 +193,23 @@ export const useTimerStore = create<TimerState>()(
             },
 
             updateSettings: (newSettings) => {
-                const { settings, mode, status } = get()
+                const { settings, mode, status, secondsRemaining } = get()
                 const merged = { ...settings, ...newSettings }
                 const updates: Partial<TimerState> = { settings: merged }
 
                 // If timer is idle, update the remaining seconds to match new durations
                 if (status === 'idle') {
                     updates.secondsRemaining = getDurationForMode(mode, merged)
+                }
+                // If paused, try to preserve ELAPSED time
+                // New Remaining = New Total - (Old Total - Old Remaining)
+                else if (status === 'paused') {
+                    const oldTotal = getDurationForMode(mode, settings)
+                    const elapsed = oldTotal - secondsRemaining
+                    const newTotal = getDurationForMode(mode, merged)
+                    const newRemaining = Math.max(0, newTotal - elapsed)
+
+                    updates.secondsRemaining = newRemaining
                 }
 
                 set(updates)

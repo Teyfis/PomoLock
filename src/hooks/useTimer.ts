@@ -19,13 +19,8 @@ export function useTimer() {
     } = useTimerStore()
 
     const handlePause = useCallback(() => {
-        if (status === 'hyperfocus') {
-            // Pausing in hyperfocus -> Switch to Short Break directly
-            setMode('shortBreak')
-        } else {
-            storePause()
-        }
-    }, [status, setMode, storePause])
+        storePause()
+    }, [storePause])
 
     const formatTime = (seconds: number) => {
         const m = Math.floor(seconds / 60)

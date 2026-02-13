@@ -36,16 +36,16 @@ export function DayCell({ day, totalMinutes, isToday, intensityColors }: DayCell
         >
             <span
                 className={cn(
-                    'text-xs font-medium tabular-nums',
+                    'text-[10px] sm:text-xs font-medium tabular-nums',
                     intensity === 0 ? 'text-zinc-500' : 'text-white/90'
                 )}
-                style={{ fontFamily: 'var(--font-rubik)' }}
+                style={{ fontFamily: 'var(--font-rubik)', fontSize: '1.2em' }}
             >
                 {day}
             </span>
             {timeDisplay && (
                 <span
-                    className="text-[10px] font-mono text-white/70 tabular-nums"
+                    className="text-[10px] font-mono text-white/70 tabular-nums scale-110"
                     style={{ fontFamily: 'var(--font-rubik)' }}
                 >
                     {timeDisplay}

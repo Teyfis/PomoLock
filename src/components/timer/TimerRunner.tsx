@@ -21,11 +21,11 @@ export function TimerRunner() {
             workerRef.current = new Worker('/timerWorker.js')
             workerRef.current.onmessage = (e) => {
                 if (e.data.type === 'tick') {
-                    const currentStatus = useTimerStore.getState().status
-                    if (currentStatus === 'hyperfocus') {
-                        tickHyperfocus()
-                    } else if (currentStatus === 'running') {
-                        tick()
+                    const state = useTimerStore.getState()
+                    if (state.status === 'hyperfocus') {
+                        state.tickHyperfocus()
+                    } else if (state.status === 'running') {
+                        state.tick()
                     }
                 }
             }
@@ -34,7 +34,7 @@ export function TimerRunner() {
         return () => {
             workerRef.current?.terminate()
         }
-    }, [tick, tickHyperfocus])
+    }, [])
 
     // Start/Stop worker
     useEffect(() => {
@@ -44,6 +44,49 @@ export function TimerRunner() {
             workerRef.current?.postMessage({ type: 'stop' })
         }
     }, [status])
+
+    // Alarm & Completion Logic
+    useEffect(() => {
+        if (status === 'running' && secondsRemaining === 0) {
+            const { settings, mode, hyperfocusEnabled, reset, enterHyperfocus } = useTimerStore.getState()
+
+            if (settings.soundEnabled) {
+                try {
+                    const AudioContext = window.AudioContext || (window as any).webkitAudioContext
+                    if (AudioContext) {
+                        const ctx = new AudioContext()
+                        const osc = ctx.createOscillator()
+                        const gain = ctx.createGain()
+
+                        osc.connect(gain)
+                        gain.connect(ctx.destination)
+
+                        osc.type = 'sine'
+                        osc.frequency.setValueAtTime(880, ctx.currentTime)
+                        osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.5)
+
+                        gain.gain.setValueAtTime(settings.soundVolume, ctx.currentTime)
+                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5)
+
+                        osc.start(ctx.currentTime)
+                        osc.stop(ctx.currentTime + 0.5)
+                    }
+                } catch (e) {
+                    console.error("Audio playback failed", e)
+                }
+            }
+
+            if (mode === 'focus' && hyperfocusEnabled) {
+                enterHyperfocus()
+            } else {
+                // User requested: "Voltar para o tempo que o usuario setou" (Reset)
+                if (mode === 'focus') {
+                    useTimerStore.setState(s => ({ completedPomodoros: s.completedPomodoros + 1 }))
+                }
+                reset()
+            }
+        }
+    }, [secondsRemaining, status])
 
     // Update Page Title
     useEffect(() => {
