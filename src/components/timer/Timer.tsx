@@ -6,6 +6,7 @@ import { TimerDisplay } from './TimerDisplay'
 import { TimerControls } from './TimerControls'
 import { BarChart3, Hourglass } from 'lucide-react'
 import Link from 'next/link'
+import { SettingsDialog } from '@/components/settings/SettingsDialog'
 
 export function Timer() {
     const {
@@ -37,7 +38,7 @@ export function Timer() {
                     Pomodoro
                 </h1>
                 <div className="flex items-center gap-3">
-                    {/* Stats button moved to bottom */}
+                    <SettingsDialog />
                 </div>
             </header>
 
