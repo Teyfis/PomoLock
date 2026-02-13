@@ -58,25 +58,58 @@ export function TimerRunner() {
                         const now = ctx.currentTime
                         const repeat = settings.alarmRepeatCount || 3
 
-                        // Schedule beeps
+                        // Schedule "Ringbell" sounds (Bell-like additive synthesis)
                         for (let i = 0; i < repeat; i++) {
-                            const startTime = now + (i * 1.5) // 1.5s interval
+                            const startTime = now + (i * 2.0) // 2s interval for bell decay
 
-                            const osc = ctx.createOscillator()
-                            const gain = ctx.createGain()
+                            // Fundamental frequency (C5 ~ 523Hz)
+                            const osc1 = ctx.createOscillator()
+                            const gain1 = ctx.createGain()
+                            osc1.connect(gain1)
+                            gain1.connect(ctx.destination)
+                            osc1.type = 'sine'
+                            osc1.frequency.setValueAtTime(523.25, startTime)
 
-                            osc.connect(gain)
-                            gain.connect(ctx.destination)
+                            // Harmonic 1 (Octave ~ 1046Hz) - brighter attack
+                            const osc2 = ctx.createOscillator()
+                            const gain2 = ctx.createGain()
+                            osc2.connect(gain2)
+                            gain2.connect(ctx.destination)
+                            osc2.type = 'sine'
+                            osc2.frequency.setValueAtTime(1046.50, startTime)
 
-                            osc.type = 'sine'
-                            osc.frequency.setValueAtTime(880, startTime)
-                            osc.frequency.exponentialRampToValueAtTime(440, startTime + 0.5)
+                            // Harmonic 2 (Twelfth ~ 1569Hz) - metallic ring
+                            const osc3 = ctx.createOscillator()
+                            const gain3 = ctx.createGain()
+                            osc3.connect(gain3)
+                            gain3.connect(ctx.destination)
+                            osc3.type = 'sine'
+                            osc3.frequency.setValueAtTime(1569, startTime)
 
-                            gain.gain.setValueAtTime(settings.soundVolume, startTime)
-                            gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.5)
+                            // Envelope - Quick attack, long exponential decay
+                            const volume = settings.soundVolume
 
-                            osc.start(startTime)
-                            osc.stop(startTime + 0.5)
+                            // Fundamental: Long decay
+                            gain1.gain.setValueAtTime(0.01, startTime)
+                            gain1.gain.exponentialRampToValueAtTime(volume, startTime + 0.05)
+                            gain1.gain.exponentialRampToValueAtTime(0.01, startTime + 2.0)
+
+                            // Harmonic 1: shorter decay
+                            gain2.gain.setValueAtTime(0.01, startTime)
+                            gain2.gain.exponentialRampToValueAtTime(volume * 0.6, startTime + 0.05)
+                            gain2.gain.exponentialRampToValueAtTime(0.01, startTime + 1.5)
+
+                            // Harmonic 2: shortest decay (ping)
+                            gain3.gain.setValueAtTime(0.01, startTime)
+                            gain3.gain.exponentialRampToValueAtTime(volume * 0.3, startTime + 0.05)
+                            gain3.gain.exponentialRampToValueAtTime(0.01, startTime + 1.0)
+
+                            osc1.start(startTime)
+                            osc1.stop(startTime + 2.0)
+                            osc2.start(startTime)
+                            osc2.stop(startTime + 2.0)
+                            osc3.start(startTime)
+                            osc3.stop(startTime + 2.0)
                         }
                     }
                 } catch (e) {

@@ -28,24 +28,30 @@ export function useTimer() {
         return `${m}:${s.toString().padStart(2, '0')}`
     }
 
-    const displaySeconds = status === 'hyperfocus' ? hyperfocusSeconds : secondsRemaining
+    const isHyperfocusPaused = useCallback(() => {
+        return status === 'paused' && mode === 'focus' && secondsRemaining === 0 && hyperfocusEnabled
+    }, [status, mode, secondsRemaining, hyperfocusEnabled])
+
+    const displaySeconds = status === 'hyperfocus' || isHyperfocusPaused() ? hyperfocusSeconds : secondsRemaining
 
     const getAccentColor = useCallback(() => {
-        if (status === 'hyperfocus') return settings.modeColors.hyperfocus
+        if (status === 'hyperfocus' || isHyperfocusPaused()) return settings.modeColors.hyperfocus
         return settings.modeColors[mode]
-    }, [settings, mode, status])
+    }, [settings, mode, status, isHyperfocusPaused])
 
     const getModeLabel = useCallback(() => {
         if (status === 'hyperfocus') return 'Hyperfocus'
+        if (isHyperfocusPaused()) return 'Hyperfocus Paused'
+
         switch (mode) {
             case 'focus': return 'Pomodoro'
             case 'shortBreak': return 'Short Break'
             case 'longBreak': return 'Long Break'
         }
-    }, [mode, status])
+    }, [mode, status, isHyperfocusPaused])
 
     const getProgress = useCallback(() => {
-        if (status === 'hyperfocus') return 1
+        if (status === 'hyperfocus' || isHyperfocusPaused()) return 1
         const total = (() => {
             switch (mode) {
                 case 'focus': return settings.focusDuration * 60
