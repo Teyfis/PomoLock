@@ -28,10 +28,11 @@ export interface AppSettings extends TimerSettings {
     modeColors: ModeColors
     dashboardAccent: string
     locale: 'en' | 'pt-BR'
+    showTimerInTitle: boolean
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
-    focusDuration: 50,
+    focusDuration: 25,
     shortBreakDuration: 5,
     longBreakDuration: 15,
     pomodorosUntilLongBreak: 4,
@@ -45,8 +46,9 @@ export const DEFAULT_SETTINGS: AppSettings = {
         longBreak: '#397097',
         hyperfocus: '#8b5cf6',
     },
-    dashboardAccent: '#8b5cf6',
+    dashboardAccent: '#64748b',
     locale: 'en',
+    showTimerInTitle: true,
 }
 
 // ==========================================

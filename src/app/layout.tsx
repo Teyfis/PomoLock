@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Rubik } from "next/font/google";
+import { TimerRunner } from "@/components/timer/TimerRunner";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -22,6 +23,9 @@ export const metadata: Metadata = {
   title: "Pomodoro Timer",
   description:
     "A customizable Pomodoro Timer with hyperfocus mode, heatmap statistics, and cloud sync.",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
@@ -34,6 +38,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${rubik.variable} antialiased bg-[#1A1B24]`}
       >
+        <TimerRunner />
         {children}
       </body>
     </html>

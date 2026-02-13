@@ -175,6 +175,22 @@ export function SettingsDialog() {
                         </div>
                     </section>
 
+                    {/* General Settings */}
+                    <section className="space-y-3">
+                        <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider">
+                            General
+                        </h3>
+                        <div className="flex items-center justify-between">
+                            <Label className="text-sm text-zinc-300">Show timer in browser tab</Label>
+                            <Switch
+                                checked={draft.showTimerInTitle ?? true}
+                                onCheckedChange={(v) =>
+                                    setDraft({ ...draft, showTimerInTitle: v })
+                                }
+                            />
+                        </div>
+                    </section>
+
                     {/* Mode Colors */}
                     <section className="space-y-3">
                         <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider">
@@ -206,16 +222,26 @@ export function SettingsDialog() {
                                 </div>
                             ))}
                         </div>
-                        <div className="flex items-center gap-2 pt-1">
-                            <input
-                                type="color"
-                                value={draft.dashboardAccent}
-                                onChange={(e) =>
-                                    setDraft({ ...draft, dashboardAccent: e.target.value })
-                                }
-                                className="w-8 h-8 rounded-full border-0 cursor-pointer bg-transparent [&::-webkit-color-swatch]:rounded-full [&::-webkit-color-swatch-wrapper]:p-0.5 [&::-moz-color-swatch]:rounded-full"
-                            />
-                            <Label className="text-xs text-zinc-400">Dashboard</Label>
+                        <div className="flex items-center justify-between pt-1">
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="color"
+                                    value={draft.dashboardAccent}
+                                    onChange={(e) =>
+                                        setDraft({ ...draft, dashboardAccent: e.target.value })
+                                    }
+                                    className="w-8 h-8 rounded-full border-0 cursor-pointer bg-transparent [&::-webkit-color-swatch]:rounded-full [&::-webkit-color-swatch-wrapper]:p-0.5 [&::-moz-color-swatch]:rounded-full"
+                                />
+                                <Label className="text-xs text-zinc-400">Dashboard</Label>
+                            </div>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setDraft({ ...draft, dashboardAccent: '#64748b' })}
+                                className="text-[10px] h-6 px-2 text-zinc-500 hover:text-zinc-300"
+                            >
+                                Reset to Default
+                            </Button>
                         </div>
                     </section>
 

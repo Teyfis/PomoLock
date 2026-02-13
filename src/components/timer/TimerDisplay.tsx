@@ -19,9 +19,9 @@ export function TimerDisplay({
     isHyperfocus,
     onReset,
 }: TimerDisplayProps) {
-    // SVG circular progress — thicker ring during hyperfocus
+    // SVG circular progress — thicker ring always
     const size = 280
-    const strokeWidth = isHyperfocus ? 10 : 6
+    const strokeWidth = 10
     const radius = (size - strokeWidth) / 2
     const circumference = 2 * Math.PI * radius
     const offset = circumference * (1 - progress)
@@ -60,7 +60,7 @@ export function TimerDisplay({
 
             {/* Center content */}
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-1">
-                <span className="text-6xl sm:text-7xl font-bold text-white tabular-nums tracking-tight" style={{ fontFamily: 'var(--font-rubik)' }}>
+                <span className="text-5xl sm:text-6xl font-bold text-white tabular-nums tracking-tight" style={{ fontFamily: 'var(--font-rubik)' }}>
                     {formattedTime}
                 </span>
                 <span className="text-sm font-medium tabular-nums" style={{ color: isRunning ? accentColor : 'rgba(161,161,170,1)' }}>

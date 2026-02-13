@@ -41,7 +41,7 @@ export default function DashboardPage() {
                     </div>
                     <SettingsDialog />
                 </div>
-                <div className="bg-zinc-800/30 rounded-xl p-5 border border-zinc-700/30">
+                <div className="bg-zinc-800/30 rounded-xl p-5 border border-zinc-700/30 transform scale-110 origin-top">
                     <HeatmapCalendar sessions={MOCK_SESSIONS} accentColor={dashboardAccent} />
                 </div>
             </div>

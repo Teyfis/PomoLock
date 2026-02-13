@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Body -->
+  <circle cx="50" cy="55" r="40" fill="#ef4444" />
+  <!-- Shine -->
+  <ellipse cx="35" cy="40" rx="10" ry="5" fill="rgba(255,255,255,0.3)" transform="rotate(-30 35 40)" />
+  <!-- Leaves/Calyx -->
+  <path d="M50 20 C40 10, 30 25, 30 35 C40 45, 48 50, 50 50 C52 50, 60 45, 70 35 C70 25, 60 10, 50 20 Z" fill="#22c55e" />
+  <!-- Stem -->
+  <rect x="47" y="5" width="6" height="20" rx="2" fill="#15803d" />
+</svg>
