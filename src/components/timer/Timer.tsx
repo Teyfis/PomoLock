@@ -4,56 +4,94 @@ import { useTimer } from '@/hooks/useTimer'
 import { ModeSelector } from './ModeSelector'
 import { TimerDisplay } from './TimerDisplay'
 import { TimerControls } from './TimerControls'
+import { BarChart3, Hourglass } from 'lucide-react'
+import Link from 'next/link'
 
 export function Timer() {
     const {
         mode,
         status,
         completedPomodoros,
+        hyperfocusEnabled,
         formattedTime,
-        formattedHyperfocus,
-        modeColor,
+        accentColor,
+        modeLabel,
+        progress,
         start,
         pause,
         reset,
         skip,
-        exitHyperfocus,
+        toggleHyperfocus,
     } = useTimer()
 
-    const isHyperfocus = status === 'hyperfocus'
+    const pomodoroText = completedPomodoros === 1 ? 'Pomodoro' : 'Pomodoros'
 
     return (
-        <div
-            className="min-h-screen flex flex-col items-center justify-center transition-colors duration-700 ease-in-out"
-            style={{ backgroundColor: modeColor }}
-        >
-            <div className="w-full max-w-lg mx-auto px-4 flex flex-col items-center gap-10">
-                {/* Mode tabs */}
-                <ModeSelector />
+        <div className="min-h-screen bg-[#1a1a2e] flex flex-col items-center pt-8 px-4">
+            {/* Header */}
+            <header className="w-full max-w-md flex items-center justify-between mb-8">
+                <h1
+                    className="text-2xl font-bold text-white italic tracking-tight"
+                    style={{ color: accentColor }}
+                >
+                    Pomodoro
+                </h1>
+                <div className="flex items-center gap-3">
+                    <Link href="/dashboard">
+                        <button
+                            className="text-zinc-500 hover:text-zinc-300 transition-colors"
+                            aria-label="Dashboard"
+                        >
+                            <BarChart3 className="h-5 w-5" />
+                        </button>
+                    </Link>
+                </div>
+            </header>
 
-                {/* Timer display */}
+            {/* Mode selector */}
+            <div className="w-full max-w-md mb-6">
+                <ModeSelector accentColor={accentColor} />
+            </div>
+
+            {/* Pomodoro counter + Stats */}
+            <div className="w-full max-w-md flex items-center justify-between mb-10 px-1">
+                <div className="flex items-center gap-2 text-zinc-400 text-sm">
+                    <Hourglass className="h-4 w-4" style={{ color: accentColor }} />
+                    <span className="font-medium">
+                        {completedPomodoros} {pomodoroText}
+                    </span>
+                </div>
+                <Link
+                    href="/dashboard"
+                    className="flex items-center gap-1.5 text-zinc-400 text-sm hover:text-zinc-300 transition-colors"
+                >
+                    <BarChart3 className="h-4 w-4" />
+                    Stats
+                </Link>
+            </div>
+
+            {/* Circular timer */}
+            <div className="mb-10">
                 <TimerDisplay
                     formattedTime={formattedTime}
-                    isHyperfocus={isHyperfocus}
-                    formattedHyperfocus={formattedHyperfocus}
-                />
-
-                {/* Controls */}
-                <TimerControls
-                    status={status}
-                    isHyperfocus={isHyperfocus}
-                    onStart={start}
-                    onPause={pause}
+                    modeLabel={modeLabel}
+                    progress={progress}
+                    accentColor={accentColor}
+                    isRunning={status === 'running' || status === 'hyperfocus'}
                     onReset={reset}
-                    onSkip={skip}
-                    onExitHyperfocus={exitHyperfocus}
                 />
-
-                {/* Pomodoro counter */}
-                <div className="text-white/60 text-sm font-medium tracking-wide">
-                    #{completedPomodoros} pomodoros completed
-                </div>
             </div>
+
+            {/* Controls */}
+            <TimerControls
+                status={status}
+                hyperfocusEnabled={hyperfocusEnabled}
+                accentColor={accentColor}
+                onStart={start}
+                onPause={pause}
+                onSkip={skip}
+                onToggleHyperfocus={toggleHyperfocus}
+            />
         </div>
     )
 }

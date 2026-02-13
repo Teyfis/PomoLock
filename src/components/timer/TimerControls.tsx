@@ -1,83 +1,73 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
-import { Play, Pause, RotateCcw, SkipForward, Square } from 'lucide-react'
+import { Play, Pause, SkipForward, Brain } from 'lucide-react'
 import type { TimerStatus } from '@/types'
 
 interface TimerControlsProps {
     status: TimerStatus
-    isHyperfocus: boolean
+    hyperfocusEnabled: boolean
+    accentColor: string
     onStart: () => void
     onPause: () => void
-    onReset: () => void
     onSkip: () => void
-    onExitHyperfocus: () => void
+    onToggleHyperfocus: () => void
 }
 
 export function TimerControls({
     status,
-    isHyperfocus,
+    hyperfocusEnabled,
+    accentColor,
     onStart,
     onPause,
-    onReset,
     onSkip,
-    onExitHyperfocus,
+    onToggleHyperfocus,
 }: TimerControlsProps) {
-    return (
-        <div className="flex items-center justify-center gap-3">
-            {/* Reset button */}
-            <Button
-                variant="ghost"
-                size="icon"
-                onClick={onReset}
-                disabled={status === 'idle'}
-                className="text-white/70 hover:text-white hover:bg-white/10 h-12 w-12 rounded-full transition-all duration-200 disabled:opacity-30"
-                aria-label="Reset"
-            >
-                <RotateCcw className="h-5 w-5" />
-            </Button>
+    const isActive = status === 'running' || status === 'hyperfocus'
 
-            {/* Main action button */}
-            {isHyperfocus ? (
-                <Button
-                    onClick={onExitHyperfocus}
-                    className="h-16 w-40 rounded-full text-lg font-bold bg-white text-black hover:bg-white/90 shadow-lg shadow-black/20 transition-all duration-200 active:scale-95"
-                    aria-label="Stop hyperfocus"
-                >
-                    <Square className="h-5 w-5 mr-2 fill-current" />
-                    Stop
-                </Button>
-            ) : status === 'running' ? (
-                <Button
-                    onClick={onPause}
-                    className="h-16 w-40 rounded-full text-lg font-bold bg-white text-black hover:bg-white/90 shadow-lg shadow-black/20 transition-all duration-200 active:scale-95"
-                    aria-label="Pause"
-                >
-                    <Pause className="h-5 w-5 mr-2 fill-current" />
-                    Pause
-                </Button>
-            ) : (
-                <Button
-                    onClick={onStart}
-                    className="h-16 w-40 rounded-full text-lg font-bold bg-white text-black hover:bg-white/90 shadow-lg shadow-black/20 transition-all duration-200 active:scale-95"
-                    aria-label="Start"
-                >
-                    <Play className="h-5 w-5 mr-2 fill-current" />
-                    Start
-                </Button>
-            )}
+    return (
+        <div className="flex items-center justify-center gap-5">
+            {/* Hyperfocus toggle */}
+            <button
+                onClick={onToggleHyperfocus}
+                className="h-14 w-14 rounded-full flex items-center justify-center transition-all duration-200"
+                style={{
+                    backgroundColor: hyperfocusEnabled ? `${accentColor}20` : 'rgba(255,255,255,0.06)',
+                    color: hyperfocusEnabled ? accentColor : 'rgba(255,255,255,0.4)',
+                    border: hyperfocusEnabled ? `2px solid ${accentColor}40` : '2px solid transparent',
+                }}
+                aria-label={hyperfocusEnabled ? 'Disable hyperfocus' : 'Enable hyperfocus'}
+                title={hyperfocusEnabled ? 'Hyperfocus ON' : 'Hyperfocus OFF'}
+            >
+                <Brain className="h-5 w-5" />
+            </button>
+
+            {/* Play / Pause button */}
+            <button
+                onClick={isActive ? onPause : onStart}
+                className="h-16 w-16 rounded-full flex items-center justify-center transition-all duration-200 active:scale-95 shadow-lg"
+                style={{ backgroundColor: accentColor }}
+                aria-label={isActive ? 'Pause' : 'Start'}
+            >
+                {isActive ? (
+                    <Pause className="h-6 w-6 text-white fill-white" />
+                ) : (
+                    <Play className="h-6 w-6 text-white fill-white ml-0.5" />
+                )}
+            </button>
 
             {/* Skip button */}
-            <Button
-                variant="ghost"
-                size="icon"
+            <button
                 onClick={onSkip}
                 disabled={status === 'idle'}
-                className="text-white/70 hover:text-white hover:bg-white/10 h-12 w-12 rounded-full transition-all duration-200 disabled:opacity-30"
+                className="h-14 w-14 rounded-full flex items-center justify-center transition-all duration-200 disabled:opacity-30"
+                style={{
+                    backgroundColor: 'rgba(255,255,255,0.06)',
+                    color: 'rgba(255,255,255,0.4)',
+                }}
                 aria-label="Skip"
             >
                 <SkipForward className="h-5 w-5" />
-            </Button>
+            </button>
         </div>
     )
 }

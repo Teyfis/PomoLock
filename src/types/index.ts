@@ -21,11 +21,11 @@ export interface ModeColors {
     focus: string
     shortBreak: string
     longBreak: string
+    hyperfocus: string
 }
 
 export interface AppSettings extends TimerSettings {
     modeColors: ModeColors
-    blackBgOnFocus: boolean
     locale: 'en' | 'pt-BR'
 }
 
@@ -39,11 +39,11 @@ export const DEFAULT_SETTINGS: AppSettings = {
     soundEnabled: true,
     soundVolume: 0.5,
     modeColors: {
-        focus: '#ba4949',
+        focus: '#e74c6f',
         shortBreak: '#38858a',
         longBreak: '#397097',
+        hyperfocus: '#8b5cf6',
     },
-    blackBgOnFocus: false,
     locale: 'en',
 }
 

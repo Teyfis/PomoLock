@@ -1,7 +1,8 @@
 'use client'
 
-import { Navbar } from '@/components/Navbar'
 import { HeatmapCalendar } from '@/components/dashboard/HeatmapCalendar'
+import { ArrowLeft } from 'lucide-react'
+import Link from 'next/link'
 import type { DayStats } from '@/types'
 
 // TODO: Replace with real data from Supabase once auth is set up
@@ -22,16 +23,21 @@ const MOCK_SESSIONS: DayStats[] = [
 
 export default function DashboardPage() {
     return (
-        <>
-            <Navbar />
-            <div className="min-h-screen bg-zinc-900 pt-20 px-4 pb-8">
-                <div className="max-w-lg mx-auto space-y-6">
+        <div className="min-h-screen bg-[#1a1a2e] pt-8 px-4 pb-8">
+            <div className="max-w-lg mx-auto space-y-6">
+                <div className="flex items-center gap-3">
+                    <Link
+                        href="/"
+                        className="text-zinc-400 hover:text-white transition-colors"
+                    >
+                        <ArrowLeft className="h-5 w-5" />
+                    </Link>
                     <h1 className="text-2xl font-bold text-white">Statistics</h1>
-                    <div className="bg-zinc-800/50 rounded-xl p-5 border border-zinc-700/50">
-                        <HeatmapCalendar sessions={MOCK_SESSIONS} />
-                    </div>
+                </div>
+                <div className="bg-zinc-800/30 rounded-xl p-5 border border-zinc-700/30">
+                    <HeatmapCalendar sessions={MOCK_SESSIONS} />
                 </div>
             </div>
-        </>
+        </div>
     )
 }

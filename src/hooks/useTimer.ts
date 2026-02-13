@@ -12,6 +12,7 @@ export function useTimer() {
         secondsRemaining,
         hyperfocusSeconds,
         completedPomodoros,
+        hyperfocusEnabled,
         settings,
         start,
         pause,
@@ -21,6 +22,8 @@ export function useTimer() {
         tickHyperfocus,
         enterHyperfocus,
         exitHyperfocus,
+        toggleHyperfocus,
+        setMode,
     } = useTimerStore()
 
     // Initialize Web Worker
@@ -29,35 +32,38 @@ export function useTimer() {
 
         workerRef.current.onmessage = (event) => {
             if (event.data.type === 'tick') {
-                const currentStatus = useTimerStore.getState().status
-                const currentSeconds = useTimerStore.getState().secondsRemaining
+                const state = useTimerStore.getState()
 
-                if (currentStatus === 'running') {
-                    if (currentSeconds <= 0) {
-                        // Timer reached zero — enter hyperfocus if in focus mode
-                        const currentMode = useTimerStore.getState().mode
-                        if (currentMode === 'focus') {
+                if (state.status === 'running') {
+                    if (state.secondsRemaining <= 0) {
+                        const isHyperfocusOn = state.hyperfocusEnabled
+
+                        if (state.mode === 'focus' && isHyperfocusOn) {
+                            // Silently enter hyperfocus — NO alarm
                             useTimerStore.getState().enterHyperfocus()
-                            // Play notification sound
-                            playSound()
                         } else {
-                            // Break is over — skip to next mode
+                            // Normal completion: play sound and skip
+                            playAlarm(state.settings.soundVolume)
                             useTimerStore.getState().skip()
-                            playSound()
-                            // Stop the worker
                             workerRef.current?.postMessage({ type: 'stop' })
 
                             // Auto-start if enabled
                             const s = useTimerStore.getState().settings
-                            if (s.autoStartPomodoros) {
-                                setTimeout(() => useTimerStore.getState().start(), 100)
-                                workerRef.current?.postMessage({ type: 'start' })
+                            const nextMode = useTimerStore.getState().mode
+                            if (
+                                (nextMode !== 'focus' && s.autoStartBreaks) ||
+                                (nextMode === 'focus' && s.autoStartPomodoros)
+                            ) {
+                                setTimeout(() => {
+                                    useTimerStore.getState().start()
+                                    workerRef.current?.postMessage({ type: 'start' })
+                                }, 100)
                             }
                         }
                     } else {
                         useTimerStore.getState().tick()
                     }
-                } else if (currentStatus === 'hyperfocus') {
+                } else if (state.status === 'hyperfocus') {
                     useTimerStore.getState().tickHyperfocus()
                 }
             }
@@ -90,13 +96,10 @@ export function useTimer() {
     }, [reset])
 
     const handleSkip = useCallback(() => {
-        // If in hyperfocus, exit it
         if (status === 'hyperfocus') {
             exitHyperfocus()
             return
         }
-
-        // Auto-start the break if enabled
         skip()
         const s = useTimerStore.getState().settings
         const nextMode = useTimerStore.getState().mode
@@ -115,22 +118,44 @@ export function useTimer() {
     }, [exitHyperfocus])
 
     // Format time display
-    const formatTime = useCallback(
-        (totalSeconds: number) => {
-            const minutes = Math.floor(Math.abs(totalSeconds) / 60)
-            const seconds = Math.abs(totalSeconds) % 60
-            return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
-        },
-        []
-    )
+    const formatTime = useCallback((totalSeconds: number) => {
+        const minutes = Math.floor(Math.abs(totalSeconds) / 60)
+        const seconds = Math.abs(totalSeconds) % 60
+        return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+    }, [])
 
-    // Get current mode color
-    const getModeColor = useCallback(() => {
-        if (settings.blackBgOnFocus && mode === 'focus' && (status === 'running' || status === 'hyperfocus')) {
-            return '#000000'
-        }
+    // Display time: in hyperfocus mode, show the counting-up time
+    const displaySeconds = status === 'hyperfocus' ? hyperfocusSeconds : secondsRemaining
+
+    // Get current accent color
+    const getAccentColor = useCallback(() => {
+        if (status === 'hyperfocus') return settings.modeColors.hyperfocus
         return settings.modeColors[mode]
     }, [settings, mode, status])
+
+    // Get mode label
+    const getModeLabel = useCallback(() => {
+        if (status === 'hyperfocus') return 'Hyperfocus'
+        switch (mode) {
+            case 'focus': return 'Focus'
+            case 'shortBreak': return 'Short Break'
+            case 'longBreak': return 'Long Break'
+        }
+    }, [mode, status])
+
+    // Progress ratio for circular ring (1 = full, 0 = empty)
+    const getProgress = useCallback(() => {
+        if (status === 'hyperfocus') return 1 // Full ring during hyperfocus
+        const total = (() => {
+            switch (mode) {
+                case 'focus': return settings.focusDuration * 60
+                case 'shortBreak': return settings.shortBreakDuration * 60
+                case 'longBreak': return settings.longBreakDuration * 60
+            }
+        })()
+        if (total === 0) return 0
+        return secondsRemaining / total
+    }, [mode, status, secondsRemaining, settings])
 
     return {
         mode,
@@ -138,53 +163,49 @@ export function useTimer() {
         secondsRemaining,
         hyperfocusSeconds,
         completedPomodoros,
+        hyperfocusEnabled,
         settings,
-        formattedTime: formatTime(secondsRemaining),
-        formattedHyperfocus: formatTime(hyperfocusSeconds),
-        modeColor: getModeColor(),
+        formattedTime: formatTime(displaySeconds),
+        accentColor: getAccentColor(),
+        modeLabel: getModeLabel(),
+        progress: getProgress(),
         start: handleStart,
         pause: handlePause,
         reset: handleReset,
         skip: handleSkip,
         exitHyperfocus: handleExitHyperfocus,
+        toggleHyperfocus,
+        setMode,
     }
 }
 
-function playSound() {
+// Minimalist alarm sound — short bell-like tones
+function playAlarm(volume: number) {
     const settings = useTimerStore.getState().settings
     if (!settings.soundEnabled) return
 
     try {
-        const audioContext = new AudioContext()
-        const oscillator = audioContext.createOscillator()
-        const gainNode = audioContext.createGain()
+        const ctx = new AudioContext()
+        const v = volume * 0.25
 
-        oscillator.connect(gainNode)
-        gainNode.connect(audioContext.destination)
+        // Bell tone 1
+        const playTone = (freq: number, startTime: number, duration: number) => {
+            const osc = ctx.createOscillator()
+            const gain = ctx.createGain()
+            osc.connect(gain)
+            gain.connect(ctx.destination)
+            osc.frequency.setValueAtTime(freq, startTime)
+            osc.type = 'sine'
+            gain.gain.setValueAtTime(v, startTime)
+            gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration)
+            osc.start(startTime)
+            osc.stop(startTime + duration)
+        }
 
-        oscillator.frequency.setValueAtTime(800, audioContext.currentTime)
-        oscillator.type = 'sine'
-        gainNode.gain.setValueAtTime(
-            settings.soundVolume * 0.3,
-            audioContext.currentTime
-        )
-
-        oscillator.start(audioContext.currentTime)
-        oscillator.stop(audioContext.currentTime + 0.5)
-
-        // Second beep
-        const osc2 = audioContext.createOscillator()
-        const gain2 = audioContext.createGain()
-        osc2.connect(gain2)
-        gain2.connect(audioContext.destination)
-        osc2.frequency.setValueAtTime(1000, audioContext.currentTime + 0.6)
-        osc2.type = 'sine'
-        gain2.gain.setValueAtTime(
-            settings.soundVolume * 0.3,
-            audioContext.currentTime + 0.6
-        )
-        osc2.start(audioContext.currentTime + 0.6)
-        osc2.stop(audioContext.currentTime + 1.1)
+        const now = ctx.currentTime
+        playTone(880, now, 0.15)         // A5
+        playTone(880, now + 0.2, 0.15)   // A5
+        playTone(1174, now + 0.5, 0.25)  // D6
     } catch {
         // Audio not supported
     }

@@ -19,6 +19,7 @@ interface TimerState {
     hyperfocusSeconds: number
     completedPomodoros: number
     sessionStartedAt: string | null
+    hyperfocusEnabled: boolean
 
     // Settings
     settings: AppSettings
@@ -33,6 +34,7 @@ interface TimerState {
     tickHyperfocus: () => void
     enterHyperfocus: () => void
     exitHyperfocus: () => void
+    toggleHyperfocus: () => void
     updateSettings: (settings: Partial<AppSettings>) => void
     setSecondsRemaining: (seconds: number) => void
 }
@@ -41,7 +43,7 @@ interface TimerState {
 // Helper Functions
 // ==========================================
 
-function getDurationForMode(mode: TimerMode, settings: AppSettings): number {
+export function getDurationForMode(mode: TimerMode, settings: AppSettings): number {
     switch (mode) {
         case 'focus':
             return settings.focusDuration * 60
@@ -52,7 +54,7 @@ function getDurationForMode(mode: TimerMode, settings: AppSettings): number {
     }
 }
 
-function getNextMode(
+export function getNextMode(
     currentMode: TimerMode,
     completedPomodoros: number,
     settings: AppSettings
@@ -81,6 +83,7 @@ export const useTimerStore = create<TimerState>()(
             hyperfocusSeconds: 0,
             completedPomodoros: 0,
             sessionStartedAt: null,
+            hyperfocusEnabled: false,
 
             // Settings
             settings: DEFAULT_SETTINGS,
@@ -169,6 +172,11 @@ export const useTimerStore = create<TimerState>()(
                 })
             },
 
+            toggleHyperfocus: () => {
+                const { hyperfocusEnabled } = get()
+                set({ hyperfocusEnabled: !hyperfocusEnabled })
+            },
+
             updateSettings: (newSettings) => {
                 const { settings, mode, status } = get()
                 const merged = { ...settings, ...newSettings }
@@ -191,6 +199,7 @@ export const useTimerStore = create<TimerState>()(
             partialize: (state) => ({
                 settings: state.settings,
                 completedPomodoros: state.completedPomodoros,
+                hyperfocusEnabled: state.hyperfocusEnabled,
             }),
         }
     )

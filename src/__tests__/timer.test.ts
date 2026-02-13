@@ -12,6 +12,7 @@ describe('Timer Store', () => {
             hyperfocusSeconds: 0,
             completedPomodoros: 0,
             sessionStartedAt: null,
+            hyperfocusEnabled: false,
             settings: DEFAULT_SETTINGS,
         })
     })
@@ -192,10 +193,18 @@ describe('Timer Store', () => {
         it('should update mode colors', () => {
             useTimerStore
                 .getState()
-                .updateSettings({ modeColors: { focus: '#ff0000', shortBreak: '#00ff00', longBreak: '#0000ff' } })
+                .updateSettings({ modeColors: { focus: '#ff0000', shortBreak: '#00ff00', longBreak: '#0000ff', hyperfocus: '#8b5cf6' } })
             expect(useTimerStore.getState().settings.modeColors.focus).toBe(
                 '#ff0000'
             )
+        })
+
+        it('should toggle hyperfocus', () => {
+            expect(useTimerStore.getState().hyperfocusEnabled).toBe(false)
+            useTimerStore.getState().toggleHyperfocus()
+            expect(useTimerStore.getState().hyperfocusEnabled).toBe(true)
+            useTimerStore.getState().toggleHyperfocus()
+            expect(useTimerStore.getState().hyperfocusEnabled).toBe(false)
         })
     })
 })
