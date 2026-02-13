@@ -37,14 +37,7 @@ export function Timer() {
                     Pomodoro
                 </h1>
                 <div className="flex items-center gap-3">
-                    <Link href="/dashboard">
-                        <button
-                            className="text-zinc-500 hover:text-zinc-300 transition-colors"
-                            aria-label="Dashboard"
-                        >
-                            <BarChart3 className="h-5 w-5" />
-                        </button>
-                    </Link>
+                    {/* Stats button moved to bottom */}
                 </div>
             </header>
 
