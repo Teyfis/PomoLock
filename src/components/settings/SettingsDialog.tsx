@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { Slider } from '@/components/ui/slider'
-import { Settings } from 'lucide-react'
+import { Settings, Volume2 } from 'lucide-react'
 import { useTimerStore } from '@/stores/timerStore'
 import type { AppSettings } from '@/types'
 
@@ -164,6 +164,42 @@ export function SettingsDialog() {
                                 }
                             />
                         </div>
+
+                        {/* Alarm Sound Selector */}
+                        <div className="space-y-1.5">
+                            <Label className="text-xs text-zinc-500">Alarm Tone</Label>
+                            <div className="flex items-center gap-2">
+                                {([
+                                    { value: 'bip' as const, label: 'Bip' },
+                                    { value: 'kazakhstan' as const, label: 'Kazakhstan' },
+                                ] as const).map(({ value, label }) => (
+                                    <button
+                                        key={value}
+                                        onClick={() => update({ ...draft, alarmSound: value })}
+                                        className={`flex-1 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${(draft.alarmSound ?? 'bip') === value
+                                            ? 'bg-zinc-600 text-white'
+                                            : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
+                                            }`}
+                                    >
+                                        {label}
+                                    </button>
+                                ))}
+                                <button
+                                    onClick={() => {
+                                        const file = (draft.alarmSound ?? 'bip') === 'kazakhstan' ? '/kazakhstan.mp3' : '/bip.mp3'
+                                        const audio = new Audio(file)
+                                        audio.volume = draft.soundVolume
+                                        audio.play().catch(() => { })
+                                    }}
+                                    className="p-1.5 rounded-md bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700 transition-colors"
+                                    aria-label="Test alarm sound"
+                                    title="Test"
+                                >
+                                    <Volume2 className="h-4 w-4" />
+                                </button>
+                            </div>
+                        </div>
+
                         <div className="space-y-1.5">
                             <div className="flex items-center justify-between">
                                 <Label className="text-xs text-zinc-500">Volume</Label>

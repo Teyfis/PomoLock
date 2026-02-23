@@ -30,6 +30,7 @@ export interface AppSettings extends TimerSettings {
     locale: 'en' | 'pt-BR'
     showTimerInTitle: boolean
     alarmRepeatCount: number
+    alarmSound: 'bip' | 'kazakhstan'
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -51,6 +52,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
     locale: 'en',
     showTimerInTitle: true,
     alarmRepeatCount: 3,
+    alarmSound: 'bip',
 }
 
 // ==========================================
