@@ -42,8 +42,10 @@ export function TimerRunner() {
     useEffect(() => {
         // Stop any playing alarm whenever status changes (start, reset, mode switch, etc.)
         if (audioRef.current) {
-            audioRef.current.pause()
-            audioRef.current.currentTime = 0
+            try {
+                audioRef.current.pause()
+                audioRef.current.currentTime = 0
+            } catch (_) { /* ignore if already stopped */ }
             audioRef.current = null
         }
         alarmCancelledRef.current = true
@@ -78,7 +80,7 @@ export function TimerRunner() {
                         const audio = new Audio(soundFile)
                         audio.volume = settings.soundVolume
                         audioRef.current = audio
-                        audio.play().catch(err => console.error('Audio playback failed', err))
+                        audio.play().catch(() => { /* AbortError is expected when interrupted */ })
                         audio.onended = () => {
                             audioRef.current = null
                             playOnce(index + 1)
