@@ -141,7 +141,7 @@ export function SettingsDialog() {
                             />
                         </div>
                         <div className="flex items-center justify-between">
-                            <Label className="text-sm text-zinc-300">PomoLock</Label>
+                            <Label className="text-sm text-zinc-300">Pomodoros</Label>
                             <Switch
                                 checked={draft.autoStartPomodoros}
                                 onCheckedChange={(v) =>
@@ -297,7 +297,16 @@ export function SettingsDialog() {
                             <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => update({ ...draft, dashboardAccent: '#64748b' })}
+                                onClick={() => update({
+                                    ...draft,
+                                    dashboardAccent: '#64748b',
+                                    modeColors: {
+                                        focus: '#e74c6f',
+                                        shortBreak: '#1fcf81',
+                                        longBreak: '#397097',
+                                        hyperfocus: '#8b5cf6',
+                                    },
+                                })}
                                 className="text-[10px] h-6 px-2 text-zinc-500 hover:text-zinc-300"
                             >
                                 Reset to Default
