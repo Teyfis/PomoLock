@@ -20,9 +20,9 @@ const rubik = Rubik({
 });
 
 export const metadata: Metadata = {
-  title: "Pomodoro Timer",
+  title: "PomoLock",
   description:
-    "A customizable Pomodoro Timer with hyperfocus mode, heatmap statistics, and cloud sync.",
+    "PomoLock — A customizable Pomodoro Timer with hyperfocus mode, heatmap statistics, and cloud sync.",
   icons: {
     icon: "/icon.svg",
   },

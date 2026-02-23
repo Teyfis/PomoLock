@@ -1,6 +1,6 @@
 {
     "common": {
-        "appName": "Pomodoro Timer",
+        "appName": "PomoLock",
         "start": "Start",
         "pause": "Pause",
         "reset": "Reset",

@@ -25,7 +25,7 @@ export function Timer() {
         toggleHyperfocus,
     } = useTimer()
 
-    const pomodoroText = completedPomodoros === 1 ? 'Pomodoro' : 'Pomodoros'
+    const pomodoroText = completedPomodoros === 1 ? 'PomoLock' : 'PomoLocks'
 
     return (
         <div className="min-h-screen bg-[#1A1B24] flex flex-col items-center pt-8 px-4">
@@ -35,7 +35,7 @@ export function Timer() {
                     className="text-2xl font-bold text-white italic tracking-tight"
                     style={{ color: accentColor }}
                 >
-                    Pomodoro
+                    PomoLock
                 </h1>
                 <div className="flex items-center gap-3">
                     <SettingsDialog />

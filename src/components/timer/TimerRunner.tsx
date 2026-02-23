@@ -117,7 +117,7 @@ export function TimerRunner() {
     // Update Page Title
     useEffect(() => {
         if (!showTimerInTitle) {
-            document.title = 'Pomodoro Timer'
+            document.title = 'PomoLock'
             return
         }
 
@@ -127,14 +127,14 @@ export function TimerRunner() {
             return `${m}:${sec.toString().padStart(2, '0')}`
         }
 
-        let title = 'Pomodoro Timer'
+        let title = 'PomoLock'
         if (status === 'running' || status === 'paused') {
-            title = `(${format(secondsRemaining)}) ${mode === 'focus' ? 'Pomodoro' : 'Break'}`
+            title = `(${format(secondsRemaining)}) ${mode === 'focus' ? 'PomoLock' : 'Break'}`
         } else if (status === 'hyperfocus') {
             // For hyperfocus we count UP, so secondsRemaining is actually 0 or close to 0 in store logic?
             // No, hyperfocusSeconds is tracked separately.
             const hyperfocusSeconds = useTimerStore.getState().hyperfocusSeconds
-            title = `(Hyper: ${format(hyperfocusSeconds)}) Pomodoro`
+            title = `(Hyper: ${format(hyperfocusSeconds)}) PomoLock`
         }
 
         document.title = title

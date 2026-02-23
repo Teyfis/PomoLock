@@ -4,7 +4,7 @@ import { useTimerStore } from '@/stores/timerStore'
 import type { TimerMode } from '@/types'
 
 const MODES: { value: TimerMode; label: string }[] = [
-    { value: 'focus', label: 'Pomodoro' },
+    { value: 'focus', label: 'PomoLock' },
     { value: 'shortBreak', label: 'Short Break' },
     { value: 'longBreak', label: 'Long Break' },
 ]

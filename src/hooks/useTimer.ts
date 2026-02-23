@@ -44,7 +44,7 @@ export function useTimer() {
         if (isHyperfocusPaused()) return 'Hyperfocus Paused'
 
         switch (mode) {
-            case 'focus': return 'Pomodoro'
+            case 'focus': return 'PomoLock'
             case 'shortBreak': return 'Short Break'
             case 'longBreak': return 'Long Break'
         }

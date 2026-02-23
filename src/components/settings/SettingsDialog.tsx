@@ -61,7 +61,7 @@ export function SettingsDialog() {
                         </h3>
                         <div className="grid grid-cols-3 gap-3">
                             <div>
-                                <Label className="text-xs text-zinc-500">Pomodoro</Label>
+                                <Label className="text-xs text-zinc-500">PomoLock</Label>
                                 <Input
                                     type="number"
                                     min={1}
@@ -141,7 +141,7 @@ export function SettingsDialog() {
                             />
                         </div>
                         <div className="flex items-center justify-between">
-                            <Label className="text-sm text-zinc-300">Pomodoros</Label>
+                            <Label className="text-sm text-zinc-300">PomoLock</Label>
                             <Switch
                                 checked={draft.autoStartPomodoros}
                                 onCheckedChange={(v) =>
@@ -258,7 +258,7 @@ export function SettingsDialog() {
                         </h3>
                         <div className="grid grid-cols-2 gap-3">
                             {[
-                                { key: 'focus' as const, label: 'Pomodoro' },
+                                { key: 'focus' as const, label: 'PomoLock' },
                                 { key: 'shortBreak' as const, label: 'Short Break' },
                                 { key: 'longBreak' as const, label: 'Long Break' },
                                 { key: 'hyperfocus' as const, label: 'Hyperfocus' },
