@@ -14,6 +14,8 @@ export function TimerRunner() {
     const showTimerInTitle = useTimerStore((s) => s.settings.showTimerInTitle ?? true)
 
     const workerRef = useRef<Worker | null>(null)
+    const audioRef = useRef<HTMLAudioElement | null>(null)
+    const alarmCancelledRef = useRef(false)
 
     // Initialize worker
     useEffect(() => {
@@ -36,10 +38,18 @@ export function TimerRunner() {
         }
     }, [])
 
-    // Start/Stop worker
+    // Start/Stop worker + stop alarm when user starts a new timer
     useEffect(() => {
         if (status === 'running' || status === 'hyperfocus') {
             workerRef.current?.postMessage({ type: 'start' })
+
+            // Stop any playing alarm when a new timer starts
+            if (audioRef.current) {
+                audioRef.current.pause()
+                audioRef.current.currentTime = 0
+                audioRef.current = null
+            }
+            alarmCancelledRef.current = true
         } else {
             workerRef.current?.postMessage({ type: 'stop' })
         }
@@ -59,13 +69,20 @@ export function TimerRunner() {
                     const repeat = settings.alarmRepeatCount || 3
                     const soundFile = settings.alarmSound === 'kazakhstan' ? '/kazakhstan.mp3' : '/bip.mp3'
 
+                    // Reset cancel flag for this alarm sequence
+                    alarmCancelledRef.current = false
+
                     // Play the selected alarm sound file, repeated N times
                     const playOnce = (index: number) => {
-                        if (index >= repeat) return
+                        if (index >= repeat || alarmCancelledRef.current) return
                         const audio = new Audio(soundFile)
                         audio.volume = settings.soundVolume
+                        audioRef.current = audio
                         audio.play().catch(err => console.error('Audio playback failed', err))
-                        audio.onended = () => playOnce(index + 1)
+                        audio.onended = () => {
+                            audioRef.current = null
+                            playOnce(index + 1)
+                        }
                     }
                     playOnce(0)
                 } catch (e) {
