@@ -38,24 +38,34 @@ export function TimerRunner() {
         }
     }, [])
 
-    // Start/Stop worker + stop alarm on any status change
-    useEffect(() => {
-        // Stop any playing alarm whenever status changes (start, reset, mode switch, etc.)
+    // Helper to stop alarm
+    const stopAlarm = () => {
         if (audioRef.current) {
             try {
                 audioRef.current.pause()
                 audioRef.current.currentTime = 0
-            } catch (_) { /* ignore if already stopped */ }
+            } catch (_) { /* ignore */ }
             audioRef.current = null
         }
         alarmCancelledRef.current = true
+    }
 
+    // Listen for explicit "stop alarm" from UI components (e.g. ModeSelector)
+    useEffect(() => {
+        const handler = () => stopAlarm()
+        window.addEventListener('pomodoro-stop-alarm', handler)
+        return () => window.removeEventListener('pomodoro-stop-alarm', handler)
+    }, [])
+
+    // Start/Stop worker + stop alarm ONLY when user starts a new timer
+    useEffect(() => {
         if (status === 'running' || status === 'hyperfocus') {
+            stopAlarm()
             workerRef.current?.postMessage({ type: 'start' })
         } else {
             workerRef.current?.postMessage({ type: 'stop' })
         }
-    }, [status, mode])
+    }, [status])
 
     // Alarm & Completion Logic
     useEffect(() => {

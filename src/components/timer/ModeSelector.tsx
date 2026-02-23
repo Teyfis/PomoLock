@@ -19,6 +19,9 @@ export function ModeSelector({ accentColor }: ModeSelectorProps) {
     const reset = useTimerStore((s) => s.reset)
 
     const handleClick = (value: TimerMode) => {
+        // Stop any playing alarm when mode button is clicked
+        window.dispatchEvent(new Event('pomodoro-stop-alarm'))
+
         if (value === mode) {
             // Clicking current tab resets the timer
             reset()
