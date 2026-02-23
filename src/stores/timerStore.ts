@@ -38,6 +38,7 @@ interface TimerState {
     toggleHyperfocus: () => void
     updateSettings: (settings: Partial<AppSettings>) => void
     setSecondsRemaining: (seconds: number) => void
+    resetStats: () => void
 }
 
 // ==========================================
@@ -217,6 +218,10 @@ export const useTimerStore = create<TimerState>()(
 
             setSecondsRemaining: (seconds) => {
                 set({ secondsRemaining: seconds })
+            },
+
+            resetStats: () => {
+                set({ completedPomodoros: 0 })
             },
         }),
         {

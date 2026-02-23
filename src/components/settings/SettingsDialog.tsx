@@ -13,13 +13,14 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { Slider } from '@/components/ui/slider'
-import { Settings, Volume2 } from 'lucide-react'
+import { Settings, Volume2, Trash2 } from 'lucide-react'
 import { useTimerStore } from '@/stores/timerStore'
 import type { AppSettings } from '@/types'
 
 export function SettingsDialog() {
     const settings = useTimerStore((s) => s.settings)
     const updateSettings = useTimerStore((s) => s.updateSettings)
+    const resetStats = useTimerStore((s) => s.resetStats)
     const [open, setOpen] = useState(false)
     const [draft, setDraft] = useState<AppSettings>(settings)
 
@@ -304,7 +305,27 @@ export function SettingsDialog() {
                         </div>
                     </section>
 
-                    {/* Save */}
+                    {/* Danger Zone */}
+                    <section className="space-y-3 pt-2 border-t border-zinc-800">
+                        <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider">
+                            Danger Zone
+                        </h3>
+                        <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => {
+                                if (window.confirm('Are you sure you want to reset all statistics? This cannot be undone.')) {
+                                    resetStats()
+                                }
+                            }}
+                            className="w-full"
+                        >
+                            <Trash2 className="h-4 w-4" />
+                            Reset Statistics
+                        </Button>
+                    </section>
+
+                    {/* Close */}
                     <Button
                         onClick={handleClose}
                         className="w-full bg-zinc-700 hover:bg-zinc-600 text-white"
