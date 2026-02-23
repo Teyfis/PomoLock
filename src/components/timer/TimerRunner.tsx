@@ -38,22 +38,22 @@ export function TimerRunner() {
         }
     }, [])
 
-    // Start/Stop worker + stop alarm when user starts a new timer
+    // Start/Stop worker + stop alarm on any status change
     useEffect(() => {
+        // Stop any playing alarm whenever status changes (start, reset, mode switch, etc.)
+        if (audioRef.current) {
+            audioRef.current.pause()
+            audioRef.current.currentTime = 0
+            audioRef.current = null
+        }
+        alarmCancelledRef.current = true
+
         if (status === 'running' || status === 'hyperfocus') {
             workerRef.current?.postMessage({ type: 'start' })
-
-            // Stop any playing alarm when a new timer starts
-            if (audioRef.current) {
-                audioRef.current.pause()
-                audioRef.current.currentTime = 0
-                audioRef.current = null
-            }
-            alarmCancelledRef.current = true
         } else {
             workerRef.current?.postMessage({ type: 'stop' })
         }
-    }, [status])
+    }, [status, mode])
 
     // Alarm & Completion Logic
     useEffect(() => {
