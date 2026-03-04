@@ -4,6 +4,7 @@ import {
     type TimerMode,
     type TimerStatus,
     type AppSettings,
+    type FocusSession,
     DEFAULT_SETTINGS,
 } from '@/types'
 
@@ -25,6 +26,9 @@ interface TimerState {
     // Settings
     settings: AppSettings
 
+    // Sync
+    pendingSessions: FocusSession[]
+
     // Actions
     setMode: (mode: TimerMode) => void
     start: () => void
@@ -39,6 +43,11 @@ interface TimerState {
     updateSettings: (settings: Partial<AppSettings>) => void
     setSecondsRemaining: (seconds: number) => void
     resetStats: () => void
+
+    // Sync actions
+    addPendingSession: (session: FocusSession) => void
+    removeSyncedSessions: (ids: string[]) => void
+    replaceSettings: (settings: AppSettings) => void
 }
 
 // ==========================================
@@ -90,6 +99,9 @@ export const useTimerStore = create<TimerState>()(
 
             // Settings
             settings: DEFAULT_SETTINGS,
+
+            // Sync
+            pendingSessions: [],
 
             // Actions
             setMode: (mode) => {
@@ -223,6 +235,25 @@ export const useTimerStore = create<TimerState>()(
             resetStats: () => {
                 set({ completedPomodoros: 0 })
             },
+
+            // Sync actions
+            addPendingSession: (session) => {
+                const { pendingSessions } = get()
+                set({ pendingSessions: [...pendingSessions, session] })
+            },
+
+            removeSyncedSessions: (ids) => {
+                const { pendingSessions } = get()
+                set({
+                    pendingSessions: pendingSessions.filter(
+                        (s) => !ids.includes(s.id)
+                    ),
+                })
+            },
+
+            replaceSettings: (settings) => {
+                set({ settings })
+            },
         }),
         {
             name: 'pomodoro-timer-storage',
@@ -236,6 +267,7 @@ export const useTimerStore = create<TimerState>()(
                 secondsRemaining: state.secondsRemaining,
                 hyperfocusSeconds: state.hyperfocusSeconds,
                 pausedFromHyperfocus: state.pausedFromHyperfocus,
+                pendingSessions: state.pendingSessions,
             }),
             // Deep merge to handle new settings fields (e.g. dashboardAccent)
             merge: (persisted, current) => {

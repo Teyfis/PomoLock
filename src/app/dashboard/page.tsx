@@ -1,7 +1,6 @@
 'use client'
 
 import { HeatmapCalendar } from '@/components/dashboard/HeatmapCalendar'
-import { SettingsDialog } from '@/components/settings/SettingsDialog'
 import { ArrowLeft } from 'lucide-react'
 import { useTimerStore } from '@/stores/timerStore'
 import Link from 'next/link'
@@ -27,7 +26,7 @@ export default function DashboardPage() {
     const dashboardAccent = useTimerStore((s) => s.settings.dashboardAccent) || '#8b5cf6'
 
     return (
-        <div className="min-h-screen bg-[#1A1B24] pt-8 px-4 pb-8">
+        <div className="min-h-screen bg-[#1A1B24] pt-16 px-4 pb-8">
             <div className="max-w-lg mx-auto space-y-6">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -39,7 +38,6 @@ export default function DashboardPage() {
                         </Link>
                         <h1 className="text-2xl font-bold text-white">Statistics</h1>
                     </div>
-                    <SettingsDialog />
                 </div>
                 <div className="bg-zinc-800/30 rounded-xl p-5 border border-zinc-700/30 transform scale-110 origin-top">
                     <HeatmapCalendar sessions={MOCK_SESSIONS} accentColor={dashboardAccent} />

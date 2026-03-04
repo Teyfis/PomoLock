@@ -1,6 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Rubik } from "next/font/google";
 import { TimerRunner } from "@/components/timer/TimerRunner";
+import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
+import { Navbar } from "@/components/Navbar";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -23,9 +25,20 @@ export const metadata: Metadata = {
   title: "PomoLock",
   description:
     "PomoLock — A customizable Pomodoro Timer with hyperfocus mode, heatmap statistics, and cloud sync.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "PomoLock",
+  },
   icons: {
     icon: "/icon.svg",
+    apple: "/icon-192.png",
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#e74c6f",
 };
 
 export default function RootLayout({
@@ -39,6 +52,8 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${rubik.variable} antialiased bg-[#1A1B24]`}
       >
         <TimerRunner />
+        <ServiceWorkerRegistration />
+        <Navbar />
         {children}
       </body>
     </html>

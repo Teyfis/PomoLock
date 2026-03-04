@@ -29,7 +29,7 @@ export function TimerControls({
             {/* Hyperfocus toggle */}
             <button
                 onClick={onToggleHyperfocus}
-                className="h-14 w-14 rounded-full flex items-center justify-center transition-all duration-200"
+                className="h-14 w-14 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer"
                 style={{
                     backgroundColor: hyperfocusEnabled ? `${accentColor}20` : 'rgba(255,255,255,0.06)',
                     color: hyperfocusEnabled ? accentColor : 'rgba(255,255,255,0.4)',
@@ -44,7 +44,7 @@ export function TimerControls({
             {/* Play / Pause button */}
             <button
                 onClick={isActive ? onPause : onStart}
-                className="h-16 w-16 rounded-full flex items-center justify-center transition-all duration-200 active:scale-95 shadow-lg"
+                className="h-16 w-16 rounded-full flex items-center justify-center transition-all duration-200 active:scale-95 shadow-lg cursor-pointer"
                 style={{ backgroundColor: accentColor }}
                 aria-label={isActive ? 'Pause' : 'Start'}
             >
@@ -59,7 +59,7 @@ export function TimerControls({
             <button
                 onClick={onSkip}
                 disabled={status === 'idle'}
-                className="h-14 w-14 rounded-full flex items-center justify-center transition-all duration-200 disabled:opacity-30"
+                className="h-14 w-14 rounded-full flex items-center justify-center transition-all duration-200 disabled:opacity-30 cursor-pointer disabled:cursor-default"
                 style={{
                     backgroundColor: 'rgba(255,255,255,0.06)',
                     color: 'rgba(255,255,255,0.4)',
