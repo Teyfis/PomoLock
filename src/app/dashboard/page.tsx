@@ -14,9 +14,9 @@ function buildStatsFromSessions(): DayStats[] {
 
     // Add data from pending sessions
     for (const session of pendingSessions) {
-        const date = session.started_at.split('T')[0]
+        const date = session.startedAt.split('T')[0]
         const existing = dayMap.get(date) || { date, totalMinutes: 0, sessionCount: 0 }
-        existing.totalMinutes += session.duration_minutes
+        existing.totalMinutes += session.durationMinutes
         existing.sessionCount += 1
         dayMap.set(date, existing)
     }
