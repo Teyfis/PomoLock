@@ -37,7 +37,10 @@ export function Navbar() {
     const handleResetStats = () => {
         if (window.confirm('Are you sure you want to reset all statistics? This cannot be undone.')) {
             resetStats()
+            // Also clear localStorage to ensure no stale data persists
+            localStorage.removeItem('pomodoro-timer-storage')
             setShowDropdown(false)
+            window.location.reload()
         }
     }
 
