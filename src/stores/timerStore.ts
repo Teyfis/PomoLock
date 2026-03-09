@@ -184,14 +184,16 @@ export const useTimerStore = create<TimerState>()(
 
                 // Save full session if skipping a focus mode
                 if (mode === 'focus' && sessionStartedAt) {
+                    const { hyperfocusSeconds } = get()
                     const now = new Date().toISOString()
+                    const totalSeconds = settings.focusDuration * 60 + hyperfocusSeconds
                     const session: FocusSession = {
                         id: crypto.randomUUID(),
                         userId: '',
                         startedAt: now,
-                        durationMinutes: settings.focusDuration,
-                        actualDurationSeconds: settings.focusDuration * 60,
-                        hyperfocusSeconds: 0,
+                        durationMinutes: Math.floor(totalSeconds / 60),
+                        actualDurationSeconds: totalSeconds,
+                        hyperfocusSeconds: hyperfocusSeconds,
                         completed: true,
                         createdAt: now,
                     }
@@ -227,9 +229,27 @@ export const useTimerStore = create<TimerState>()(
             },
 
             exitHyperfocus: () => {
-                const { mode, completedPomodoros, settings } = get()
+                const { mode, completedPomodoros, settings, hyperfocusSeconds, sessionStartedAt } = get()
                 const nextMode = getNextMode(mode, completedPomodoros, settings)
                 const newPomodoros = completedPomodoros + 1
+
+                // Save session with hyperfocus time
+                if (sessionStartedAt) {
+                    const now = new Date().toISOString()
+                    const totalSeconds = settings.focusDuration * 60 + hyperfocusSeconds
+                    const session: FocusSession = {
+                        id: crypto.randomUUID(),
+                        userId: '',
+                        startedAt: now,
+                        durationMinutes: Math.floor(totalSeconds / 60),
+                        actualDurationSeconds: totalSeconds,
+                        hyperfocusSeconds: hyperfocusSeconds,
+                        completed: true,
+                        createdAt: now,
+                    }
+                    const { pendingSessions } = get()
+                    set({ pendingSessions: [...pendingSessions, session] })
+                }
 
                 set({
                     mode: nextMode,
