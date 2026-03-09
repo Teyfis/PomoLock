@@ -23,7 +23,7 @@ Since I couldn't find anything that met my exact needs, I decided to build my ow
 ## ✨ Features
 
 - ⏱️ **Pomodoro Timer** — Configurable Focus, Short Break, and Long Break
-- 🧠 **Hyperfocus Mode** — Continue beyond the timer with no limits
+- 🧠 **Hyperfocus Mode** — When enabled, the timer won't interrupt your focus when a Pomodoro ends. The counter keeps running until you feel tired and decide to start your break manually
 - 📊 **Statistics Heatmap** — Visualize your productivity GitHub/YeolPumTa style
 - 🔐 **Google Login** — OAuth authentication (optional)
 - ☁️ **Cloud Sync** — Your data follows you across devices

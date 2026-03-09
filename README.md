@@ -23,7 +23,7 @@ Como não encontrei nada que atendesse exatamente o que eu queria, resolvi const
 ## ✨ Funcionalidades
 
 - ⏱️ **Timer Pomodoro** — Focus, Short Break e Long Break configuráveis
-- 🧠 **Modo Hyperfocus** — Continue além do timer sem limites
+- 🧠 **Modo Hyperfocus** — Quando ativado, o timer não interrompe seu foco ao final de um Pomodoro. O contador continua rodando até que você se sinta cansado e decida iniciar a pausa manualmente
 - 📊 **Heatmap de estatísticas** — Visualize sua produtividade no estilo GitHub/YeolPumTa
 - 🔐 **Login com Google** — Autenticação via OAuth (opcional)
 - ☁️ **Sincronização na nuvem** — Seus dados acompanham você em qualquer dispositivo
