@@ -141,7 +141,31 @@ export const useTimerStore = create<TimerState>()(
             },
 
             reset: () => {
-                const { mode, settings } = get()
+                const { mode, settings, status, secondsRemaining, hyperfocusSeconds, sessionStartedAt } = get()
+                
+                // Save partial session if resetting during a focus mode
+                if (mode === 'focus' && (status === 'running' || status === 'paused' || status === 'hyperfocus') && sessionStartedAt) {
+                    const totalSeconds = getDurationForMode('focus', settings)
+                    const elapsedSeconds = totalSeconds - secondsRemaining + hyperfocusSeconds
+                    const elapsedMinutes = Math.floor(elapsedSeconds / 60)
+                    
+                    // Only save if at least 1 minute was studied
+                    if (elapsedMinutes >= 1) {
+                        const session: FocusSession = {
+                            id: crypto.randomUUID(),
+                            userId: '',
+                            startedAt: sessionStartedAt,
+                            durationMinutes: settings.focusDuration,
+                            actualDurationSeconds: elapsedSeconds,
+                            hyperfocusSeconds: hyperfocusSeconds,
+                            completed: false,
+                            createdAt: new Date().toISOString(),
+                        }
+                        const { pendingSessions } = get()
+                        set({ pendingSessions: [...pendingSessions, session] })
+                    }
+                }
+                
                 set({
                     status: 'idle',
                     secondsRemaining: getDurationForMode(mode, settings),
