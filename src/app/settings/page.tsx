@@ -428,6 +428,8 @@ export default function SettingsPage() {
                                 )
                             ) {
                                 resetStats()
+                                localStorage.removeItem('pomodoro-timer-storage')
+                                window.location.reload()
                             }
                         }}
                         className="w-full"
