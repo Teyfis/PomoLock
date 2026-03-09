@@ -14,7 +14,7 @@
 
 ## 💡 Motivação
 
-Eu queria um aplicativo Pomodoro simples, mas que tivesse algo que a maioria não tem: **estatísticas visuais no estilo habit tracker**, inspiradas no app [YeolPumTa (열품타)](https://play.google.com/store/apps/details?id=com.paidtogo.yeolpumta), um aplicativo coreano de estudos. A ideia era poder visualizar meu progresso diário em um **heatmap** — parecido com o gráfico de contribuições do GitHub — para me motivar a manter a consistência nos estudos.
+Eu queria um aplicativo Pomodoro simples, mas que tivesse algo que a maioria não tem: **estatísticas visuais no estilo habit tracker**, inspiradas no app [YeolPumTa (열품타)](https://play.google.com/store/apps/details?id=com.pallo.passiontimerscoped&hl=pt_BR), um aplicativo coreano de estudos. A ideia era poder visualizar meu progresso diário em um **heatmap** — parecido com o gráfico de contribuições do GitHub — para me motivar a manter a consistência nos estudos.
 
 Outro ponto essencial era a **sincronização entre dispositivos**: eu queria acessar minhas estatísticas tanto no meu computador pessoal quanto no computador da faculdade, sem perder nenhum dado. Por isso, o PomoLock conta com login via Google e armazenamento na nuvem, garantindo que tudo esteja sempre atualizado independente de onde eu acesse.
 
