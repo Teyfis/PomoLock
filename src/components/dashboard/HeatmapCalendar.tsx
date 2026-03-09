@@ -56,9 +56,11 @@ export function HeatmapCalendar({ sessions, accentColor }: HeatmapCalendarProps)
     const dayMap = useMemo(() => {
         const map = new Map<number, number>()
         sessions.forEach((s) => {
-            const date = new Date(s.date)
-            if (date.getFullYear() === year && date.getMonth() === month) {
-                map.set(date.getDate(), s.totalMinutes)
+            // Parse date string manually to avoid UTC timezone shift
+            // new Date("2026-03-09") is interpreted as UTC midnight, which at UTC-3 becomes March 8th
+            const [y, m, d] = s.date.split('-').map(Number)
+            if (y === year && (m - 1) === month) {
+                map.set(d, s.totalMinutes)
             }
         })
         return map
