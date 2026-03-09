@@ -233,7 +233,7 @@ export const useTimerStore = create<TimerState>()(
             },
 
             resetStats: () => {
-                set({ completedPomodoros: 0 })
+                set({ completedPomodoros: 0, pendingSessions: [] })
             },
 
             // Sync actions

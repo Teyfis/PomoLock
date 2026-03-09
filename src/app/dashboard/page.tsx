@@ -6,24 +6,41 @@ import { useTimerStore } from '@/stores/timerStore'
 import Link from 'next/link'
 import type { DayStats } from '@/types'
 
-// TODO: Replace with real data from Supabase once auth is set up
-const MOCK_SESSIONS: DayStats[] = [
-    { date: '2026-02-01', totalMinutes: 240, sessionCount: 5 },
-    { date: '2026-02-02', totalMinutes: 180, sessionCount: 4 },
-    { date: '2026-02-03', totalMinutes: 360, sessionCount: 7 },
-    { date: '2026-02-04', totalMinutes: 120, sessionCount: 3 },
-    { date: '2026-02-05', totalMinutes: 480, sessionCount: 9 },
-    { date: '2026-02-06', totalMinutes: 0, sessionCount: 0 },
-    { date: '2026-02-07', totalMinutes: 90, sessionCount: 2 },
-    { date: '2026-02-08', totalMinutes: 300, sessionCount: 6 },
-    { date: '2026-02-09', totalMinutes: 420, sessionCount: 8 },
-    { date: '2026-02-10', totalMinutes: 600, sessionCount: 12 },
-    { date: '2026-02-11', totalMinutes: 150, sessionCount: 3 },
-    { date: '2026-02-12', totalMinutes: 210, sessionCount: 4 },
-]
+function buildStatsFromSessions(): DayStats[] {
+    // Build stats from pendingSessions stored in localStorage
+    const { pendingSessions, completedPomodoros } = useTimerStore.getState()
+
+    const dayMap = new Map<string, DayStats>()
+
+    // Add data from pending sessions
+    for (const session of pendingSessions) {
+        const date = session.started_at.split('T')[0]
+        const existing = dayMap.get(date) || { date, totalMinutes: 0, sessionCount: 0 }
+        existing.totalMinutes += session.duration_minutes
+        existing.sessionCount += 1
+        dayMap.set(date, existing)
+    }
+
+    // If there are completed pomodoros today but no pending sessions, show today
+    if (completedPomodoros > 0 && dayMap.size === 0) {
+        const today = new Date().toISOString().split('T')[0]
+        dayMap.set(today, {
+            date: today,
+            totalMinutes: completedPomodoros * (useTimerStore.getState().settings.focusDuration),
+            sessionCount: completedPomodoros,
+        })
+    }
+
+    return Array.from(dayMap.values()).sort((a, b) => a.date.localeCompare(b.date))
+}
 
 export default function DashboardPage() {
     const dashboardAccent = useTimerStore((s) => s.settings.dashboardAccent) || '#8b5cf6'
+    const pendingSessions = useTimerStore((s) => s.pendingSessions)
+    const completedPomodoros = useTimerStore((s) => s.completedPomodoros)
+
+    // Rebuild stats reactively when sessions or pomodoros change
+    const sessions = buildStatsFromSessions()
 
     return (
         <div className="min-h-screen bg-[#1A1B24] pt-16 px-4 pb-8">
@@ -39,9 +56,17 @@ export default function DashboardPage() {
                         <h1 className="text-2xl font-bold text-white">Statistics</h1>
                     </div>
                 </div>
-                <div className="bg-zinc-800/30 rounded-xl p-5 border border-zinc-700/30 transform scale-110 origin-top">
-                    <HeatmapCalendar sessions={MOCK_SESSIONS} accentColor={dashboardAccent} />
-                </div>
+
+                {sessions.length > 0 ? (
+                    <div className="bg-zinc-800/30 rounded-xl p-5 border border-zinc-700/30 transform scale-110 origin-top">
+                        <HeatmapCalendar sessions={sessions} accentColor={dashboardAccent} />
+                    </div>
+                ) : (
+                    <div className="flex flex-col items-center justify-center py-16 text-center">
+                        <p className="text-zinc-500 text-sm">No sessions recorded yet.</p>
+                        <p className="text-zinc-600 text-xs mt-1">Complete a Pomodoro to see your statistics here!</p>
+                    </div>
+                )}
             </div>
         </div>
     )
