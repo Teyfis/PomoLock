@@ -14,16 +14,19 @@ function buildStatsFromSessions(): DayStats[] {
 
     // Add data from pending sessions
     for (const session of pendingSessions) {
-        const date = session.startedAt.split('T')[0]
+        // Use local date instead of UTC to avoid timezone issues
+        const localDate = new Date(session.startedAt)
+        const date = `${localDate.getFullYear()}-${String(localDate.getMonth() + 1).padStart(2, '0')}-${String(localDate.getDate()).padStart(2, '0')}`
         const existing = dayMap.get(date) || { date, totalMinutes: 0, sessionCount: 0 }
-        existing.totalMinutes += session.durationMinutes
+        existing.totalMinutes += Math.floor(session.actualDurationSeconds / 60)
         existing.sessionCount += 1
         dayMap.set(date, existing)
     }
 
     // If there are completed pomodoros today but no pending sessions, show today
     if (completedPomodoros > 0 && dayMap.size === 0) {
-        const today = new Date().toISOString().split('T')[0]
+        const now = new Date()
+        const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
         dayMap.set(today, {
             date: today,
             totalMinutes: completedPomodoros * (useTimerStore.getState().settings.focusDuration),
