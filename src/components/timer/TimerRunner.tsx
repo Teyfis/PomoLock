@@ -7,6 +7,7 @@ export function TimerRunner() {
     const status = useTimerStore((s) => s.status)
     const mode = useTimerStore((s) => s.mode)
     const secondsRemaining = useTimerStore((s) => s.secondsRemaining)
+    const hyperfocusSeconds = useTimerStore((s) => s.hyperfocusSeconds)
     const tick = useTimerStore((s) => s.tick)
     const tickHyperfocus = useTimerStore((s) => s.tickHyperfocus)
 
@@ -73,7 +74,6 @@ export function TimerRunner() {
             const { settings, mode, hyperfocusEnabled, reset, enterHyperfocus } = useTimerStore.getState()
 
             // Only play sound if NOT entering Hyperfocus automatically
-            // User request: "Quando o modo hyperfocus estiver ativado quero que o alarme nao toque."
             const shouldPlaySound = settings.soundEnabled && !(mode === 'focus' && hyperfocusEnabled)
 
             if (shouldPlaySound) {
@@ -81,10 +81,8 @@ export function TimerRunner() {
                     const repeat = settings.alarmRepeatCount || 3
                     const soundFile = settings.alarmSound === 'kazakhstan' ? '/kazakhstan.mp3' : '/bip.mp3'
 
-                    // Reset cancel flag for this alarm sequence
                     alarmCancelledRef.current = false
 
-                    // Play the selected alarm sound file, repeated N times
                     const playOnce = (index: number) => {
                         if (index >= repeat || alarmCancelledRef.current) return
                         const audio = new Audio(soundFile)
@@ -105,7 +103,6 @@ export function TimerRunner() {
             if (mode === 'focus' && hyperfocusEnabled) {
                 enterHyperfocus()
             } else {
-                // User requested: "Voltar para o tempo que o usuario setou" (Reset)
                 if (mode === 'focus') {
                     useTimerStore.setState(s => ({ completedPomodoros: s.completedPomodoros + 1 }))
                 }
@@ -131,14 +128,11 @@ export function TimerRunner() {
         if (status === 'running' || status === 'paused') {
             title = `(${format(secondsRemaining)}) ${mode === 'focus' ? 'PomoLock' : 'Break'}`
         } else if (status === 'hyperfocus') {
-            // For hyperfocus we count UP, so secondsRemaining is actually 0 or close to 0 in store logic?
-            // No, hyperfocusSeconds is tracked separately.
-            const hyperfocusSeconds = useTimerStore.getState().hyperfocusSeconds
             title = `(Hyper: ${format(hyperfocusSeconds)}) PomoLock`
         }
 
         document.title = title
-    }, [secondsRemaining, status, mode, showTimerInTitle])
+    }, [secondsRemaining, hyperfocusSeconds, status, mode, showTimerInTitle])
 
     return null
 }
