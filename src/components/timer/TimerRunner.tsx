@@ -104,7 +104,10 @@ export function TimerRunner() {
                 enterHyperfocus()
             } else {
                 if (mode === 'focus') {
-                    useTimerStore.setState(s => ({ completedPomodoros: s.completedPomodoros + 1 }))
+                    const { completedPomodoros, lastPomodoroDate } = useTimerStore.getState()
+                    const today = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`
+                    const dailyCount = lastPomodoroDate !== today ? 0 : completedPomodoros
+                    useTimerStore.setState({ completedPomodoros: dailyCount + 1, lastPomodoroDate: today })
                 }
                 reset()
             }

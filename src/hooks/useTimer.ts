@@ -8,6 +8,7 @@ export function useTimer() {
         secondsRemaining,
         hyperfocusSeconds,
         completedPomodoros,
+        lastPomodoroDate,
         hyperfocusEnabled,
         settings,
         start,
@@ -17,6 +18,13 @@ export function useTimer() {
         toggleHyperfocus,
         setMode,
     } = useTimerStore()
+
+    // Compute daily pomodoro count
+    const today = (() => {
+        const now = new Date()
+        return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+    })()
+    const dailyPomodoros = lastPomodoroDate === today ? completedPomodoros : 0
 
     const handlePause = useCallback(() => {
         storePause()
@@ -68,7 +76,7 @@ export function useTimer() {
         status,
         secondsRemaining,
         hyperfocusSeconds,
-        completedPomodoros,
+        completedPomodoros: dailyPomodoros,
         hyperfocusEnabled,
         settings,
         formattedTime: formatTime(displaySeconds),

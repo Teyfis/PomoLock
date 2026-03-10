@@ -19,6 +19,7 @@ interface TimerState {
     secondsRemaining: number
     hyperfocusSeconds: number
     completedPomodoros: number
+    lastPomodoroDate: string | null  // YYYY-MM-DD local date
     sessionStartedAt: string | null
     hyperfocusEnabled: boolean
     pausedFromHyperfocus: boolean
@@ -80,6 +81,20 @@ export function getNextMode(
     return 'focus'
 }
 
+function getLocalDateString(): string {
+    const now = new Date()
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+}
+
+// Helper to get the correct pomodoro count, resetting if the day changed
+function getDailyPomodoros(completedPomodoros: number, lastPomodoroDate: string | null): number {
+    const today = getLocalDateString()
+    if (lastPomodoroDate !== today) {
+        return 0 // Day changed, reset
+    }
+    return completedPomodoros
+}
+
 // ==========================================
 // Timer Store
 // ==========================================
@@ -93,6 +108,7 @@ export const useTimerStore = create<TimerState>()(
             secondsRemaining: DEFAULT_SETTINGS.focusDuration * 60,
             hyperfocusSeconds: 0,
             completedPomodoros: 0,
+            lastPomodoroDate: null,
             sessionStartedAt: null,
             hyperfocusEnabled: false,
             pausedFromHyperfocus: false,
@@ -177,10 +193,11 @@ export const useTimerStore = create<TimerState>()(
             },
 
             skip: () => {
-                const { mode, completedPomodoros, settings, sessionStartedAt } = get()
-                const nextMode = getNextMode(mode, completedPomodoros, settings)
+                const { mode, completedPomodoros, settings, sessionStartedAt, lastPomodoroDate } = get()
+                const dailyPomodoros = getDailyPomodoros(completedPomodoros, lastPomodoroDate)
+                const nextMode = getNextMode(mode, dailyPomodoros, settings)
                 const newPomodoros =
-                    mode === 'focus' ? completedPomodoros + 1 : completedPomodoros
+                    mode === 'focus' ? dailyPomodoros + 1 : dailyPomodoros
 
                 // Save full session if skipping a focus mode
                 if (mode === 'focus' && sessionStartedAt) {
@@ -207,6 +224,7 @@ export const useTimerStore = create<TimerState>()(
                     secondsRemaining: getDurationForMode(nextMode, settings),
                     hyperfocusSeconds: 0,
                     completedPomodoros: newPomodoros,
+                    lastPomodoroDate: getLocalDateString(),
                     sessionStartedAt: null,
                     pausedFromHyperfocus: false,
                 })
@@ -229,9 +247,10 @@ export const useTimerStore = create<TimerState>()(
             },
 
             exitHyperfocus: () => {
-                const { mode, completedPomodoros, settings, hyperfocusSeconds, sessionStartedAt } = get()
-                const nextMode = getNextMode(mode, completedPomodoros, settings)
-                const newPomodoros = completedPomodoros + 1
+                const { mode, completedPomodoros, settings, hyperfocusSeconds, sessionStartedAt, lastPomodoroDate } = get()
+                const dailyPomodoros = getDailyPomodoros(completedPomodoros, lastPomodoroDate)
+                const nextMode = getNextMode(mode, dailyPomodoros, settings)
+                const newPomodoros = dailyPomodoros + 1
 
                 // Save session with hyperfocus time
                 if (sessionStartedAt) {
@@ -257,6 +276,7 @@ export const useTimerStore = create<TimerState>()(
                     secondsRemaining: getDurationForMode(nextMode, settings),
                     hyperfocusSeconds: 0,
                     completedPomodoros: newPomodoros,
+                    lastPomodoroDate: getLocalDateString(),
                     sessionStartedAt: null,
                     pausedFromHyperfocus: false,
                 })
