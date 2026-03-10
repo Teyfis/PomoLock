@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Rubik } from "next/font/google";
 import { TimerRunner } from "@/components/timer/TimerRunner";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
+import { SyncProvider } from "@/components/SyncProvider";
 import { Navbar } from "@/components/Navbar";
 import "./globals.css";
 
@@ -52,6 +53,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${rubik.variable} antialiased bg-[#1A1B24]`}
       >
         <TimerRunner />
+        <SyncProvider />
         <ServiceWorkerRegistration />
         <Navbar />
         {children}
