@@ -88,14 +88,9 @@ export default function DashboardPage() {
                         <Loader2 className="h-6 w-6 text-zinc-500 animate-spin mb-2" />
                         <p className="text-zinc-500 text-sm">Loading statistics...</p>
                     </div>
-                ) : sessions.length > 0 ? (
+                ) : (
                     <div className="bg-zinc-800/30 rounded-xl p-5 border border-zinc-700/30 transform scale-110 origin-top">
                         <HeatmapCalendar sessions={sessions} accentColor={dashboardAccent} />
-                    </div>
-                ) : (
-                    <div className="flex flex-col items-center justify-center py-16 text-center">
-                        <p className="text-zinc-500 text-sm">No sessions recorded yet.</p>
-                        <p className="text-zinc-600 text-xs mt-1">Complete a Pomodoro to see your statistics here!</p>
                     </div>
                 )}
             </div>
