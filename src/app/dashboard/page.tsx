@@ -98,6 +98,15 @@ export default function DashboardPage() {
                         <p className="text-zinc-600 text-xs mt-1">Complete a Pomodoro to see your statistics here!</p>
                     </div>
                 )}
+
+                {!user && !loading && sessions.length > 0 && (
+                    <div className="bg-yellow-900/20 border border-yellow-700/30 rounded-xl p-4 text-center">
+                        <p className="text-yellow-300/90 text-sm font-medium">⚠️ You are not logged in</p>
+                        <p className="text-yellow-400/60 text-xs mt-1">
+                            These statistics are saved locally on this device only. Log in to sync your hours across devices.
+                        </p>
+                    </div>
+                )}
             </div>
         </div>
     )
