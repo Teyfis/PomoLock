@@ -70,6 +70,35 @@ export async function pushSessionToCloud(session: FocusSession): Promise<boolean
 }
 
 /**
+ * Fetch all focus sessions from Supabase for the current user.
+ * Returns empty array if no sessions exist or user is not logged in.
+ */
+export async function fetchCloudSessions(): Promise<FocusSession[]> {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return []
+
+    const { data, error } = await supabase
+        .from('focus_sessions')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('started_at', { ascending: true })
+
+    if (error || !data) return []
+
+    return data.map((row: Record<string, unknown>) => ({
+        id: row.id as string,
+        userId: row.user_id as string,
+        startedAt: row.started_at as string,
+        durationMinutes: row.duration_minutes as number,
+        actualDurationSeconds: row.actual_duration_seconds as number,
+        hyperfocusSeconds: row.hyperfocus_seconds as number,
+        completed: row.completed as boolean,
+        createdAt: row.created_at as string,
+    }))
+}
+
+/**
  * Push all pending sessions to Supabase.
  * Returns the IDs of sessions that were successfully synced.
  */
