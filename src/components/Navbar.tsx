@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
+import { deleteCloudSessions } from '@/lib/syncController'
 import { useTimerStore } from '@/stores/timerStore'
 import { BarChart3, Timer, Settings, LogIn, LogOut, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -34,11 +35,12 @@ export function Navbar() {
         window.location.href = '/'
     }
 
-    const handleResetStats = () => {
+    const handleResetStats = async () => {
         if (window.confirm('Are you sure you want to reset all statistics? This cannot be undone.')) {
             resetStats()
-            // Also clear localStorage to ensure no stale data persists
             localStorage.removeItem('pomodoro-timer-storage')
+            // Also delete sessions from Supabase
+            await deleteCloudSessions()
             setShowDropdown(false)
             window.location.reload()
         }

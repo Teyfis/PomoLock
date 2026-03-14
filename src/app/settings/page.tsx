@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
+import { deleteCloudSessions } from '@/lib/syncController'
 import { useTimerStore } from '@/stores/timerStore'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
@@ -421,7 +422,7 @@ export default function SettingsPage() {
                     <Button
                         variant="destructive"
                         size="sm"
-                        onClick={() => {
+                        onClick={async () => {
                             if (
                                 window.confirm(
                                     'Are you sure you want to reset all statistics? This cannot be undone.'
@@ -429,6 +430,7 @@ export default function SettingsPage() {
                             ) {
                                 resetStats()
                                 localStorage.removeItem('pomodoro-timer-storage')
+                                await deleteCloudSessions()
                                 window.location.reload()
                             }
                         }}

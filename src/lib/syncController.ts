@@ -99,6 +99,23 @@ export async function fetchCloudSessions(): Promise<FocusSession[]> {
 }
 
 /**
+ * Delete all focus sessions from Supabase for the current user.
+ * Used when resetting statistics.
+ */
+export async function deleteCloudSessions(): Promise<boolean> {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return false
+
+    const { error } = await supabase
+        .from('focus_sessions')
+        .delete()
+        .eq('user_id', user.id)
+
+    return !error
+}
+
+/**
  * Push all pending sessions to Supabase.
  * Returns the IDs of sessions that were successfully synced.
  */
