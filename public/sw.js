@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pomolock-v3';
+const CACHE_NAME = 'pomolock-v4';
 
 // Assets to cache on install
 const PRECACHE_ASSETS = [

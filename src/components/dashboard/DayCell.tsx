@@ -1,10 +1,9 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { getHeatmapIntensity } from '@/types'
 
 interface DayCellProps {
-    day: number | null // null for empty cells
+    day: number | null
     totalMinutes: number
     isToday?: boolean
     intensityColors: string[]
@@ -17,37 +16,42 @@ function formatHoursMinutes(totalMinutes: number): string {
     return `${h}:${String(m).padStart(2, '0')}`
 }
 
+function getIntensity(totalMinutes: number): number {
+    const hours = totalMinutes / 60
+    if (hours >= 12) return 4
+    if (hours >= 7) return 3
+    if (hours >= 4) return 2
+    if (hours > 0) return 1
+    return 0
+}
+
 export function DayCell({ day, totalMinutes, isToday, intensityColors }: DayCellProps) {
     if (day === null) {
-        return <div className="aspect-square" />
+        return <div className="h-[58px]" />
     }
 
-    const intensity = getHeatmapIntensity(totalMinutes)
+    const intensity = getIntensity(totalMinutes)
     const timeDisplay = formatHoursMinutes(totalMinutes)
     const bgColor = intensity === 0 ? 'rgba(255,255,255,0.04)' : intensityColors[intensity]
 
     return (
         <div
             className={cn(
-                'aspect-square rounded-md flex flex-col items-center justify-center gap-0.5 transition-colors duration-200 text-center',
-                isToday && 'ring-2 ring-white/50'
+                'h-[58px] rounded-[4px] flex flex-col items-center justify-center gap-0.5 transition-colors duration-200',
+                isToday && 'ring-[1.5px] ring-white/60'
             )}
             style={{ backgroundColor: bgColor }}
         >
             <span
                 className={cn(
-                    'text-[10px] sm:text-xs font-medium tabular-nums',
-                    intensity === 0 ? 'text-zinc-500' : 'text-white/90'
+                    'text-[13px] font-medium tabular-nums leading-tight',
+                    intensity === 0 ? 'text-zinc-500' : 'text-white/85'
                 )}
-                style={{ fontFamily: 'var(--font-rubik)', fontSize: '1.2em' }}
             >
                 {day}
             </span>
             {timeDisplay && (
-                <span
-                    className="text-[10px] font-mono text-white/70 tabular-nums scale-110"
-                    style={{ fontFamily: 'var(--font-rubik)' }}
-                >
+                <span className="text-[11px] text-white/65 tabular-nums leading-tight font-medium">
                     {timeDisplay}
                 </span>
             )}

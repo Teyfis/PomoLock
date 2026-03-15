@@ -5,7 +5,7 @@ import { DayCell } from './DayCell'
 import { MonthNavigator } from './MonthNavigator'
 import type { DayStats } from '@/types'
 
-const WEEK_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+const WEEK_DAYS = ['seg.', 'ter.', 'qua.', 'qui.', 'sex.', 'sáb.', 'dom.']
 
 interface HeatmapCalendarProps {
     sessions: DayStats[]
@@ -17,19 +17,15 @@ function getCalendarGrid(year: number, month: number) {
     const lastDay = new Date(year, month + 1, 0)
     const daysInMonth = lastDay.getDate()
 
-    // getDay(): 0=Sun, 1=Mon ... 6=Sat
-    // We want Mon=0, so adjust
     let startDay = firstDay.getDay() - 1
     if (startDay < 0) startDay = 6
 
     const grid: (number | null)[] = []
 
-    // Empty cells before first day
     for (let i = 0; i < startDay; i++) {
         grid.push(null)
     }
 
-    // Days of month
     for (let d = 1; d <= daysInMonth; d++) {
         grid.push(d)
     }
@@ -45,6 +41,11 @@ function hexToRgba(hex: string, alpha: number): string {
     return `rgba(${r}, ${g}, ${b}, ${alpha})`
 }
 
+const MONTH_SHORT = [
+    'jan.', 'fev.', 'mar.', 'abr.', 'mai.', 'jun.',
+    'jul.', 'ago.', 'set.', 'out.', 'nov.', 'dez.',
+]
+
 export function HeatmapCalendar({ sessions, accentColor }: HeatmapCalendarProps) {
     const today = new Date()
     const [year, setYear] = useState(today.getFullYear())
@@ -52,12 +53,9 @@ export function HeatmapCalendar({ sessions, accentColor }: HeatmapCalendarProps)
 
     const grid = useMemo(() => getCalendarGrid(year, month), [year, month])
 
-    // Build a map of day -> totalMinutes for the current month
     const dayMap = useMemo(() => {
         const map = new Map<number, number>()
         sessions.forEach((s) => {
-            // Parse date string manually to avoid UTC timezone shift
-            // new Date("2026-03-09") is interpreted as UTC midnight, which at UTC-3 becomes March 8th
             const [y, m, d] = s.date.split('-').map(Number)
             if (y === year && (m - 1) === month) {
                 map.set(d, s.totalMinutes)
@@ -101,17 +99,19 @@ export function HeatmapCalendar({ sessions, accentColor }: HeatmapCalendarProps)
         )
     }
 
-    // Generate intensity colors based on accent color
     const intensityColors = useMemo(() => [
         'transparent',
         hexToRgba(accentColor, 0.2),
-        hexToRgba(accentColor, 0.4),
-        hexToRgba(accentColor, 0.65),
-        hexToRgba(accentColor, 0.9),
+        hexToRgba(accentColor, 0.35),
+        hexToRgba(accentColor, 0.55),
+        hexToRgba(accentColor, 0.8),
     ], [accentColor])
 
+    const totalHours = Math.floor(totalMinutes / 60)
+    const remainingMin = totalMinutes % 60
+
     return (
-        <div className="space-y-4">
+        <div className="space-y-3">
             <MonthNavigator
                 year={year}
                 month={month}
@@ -121,11 +121,11 @@ export function HeatmapCalendar({ sessions, accentColor }: HeatmapCalendarProps)
             />
 
             {/* Week day headers */}
-            <div className="grid grid-cols-7 gap-1.5">
+            <div className="grid grid-cols-7 gap-[5px]">
                 {WEEK_DAYS.map((d) => (
                     <div
                         key={d}
-                        className="text-center text-xs text-zinc-500 font-medium py-1"
+                        className="text-center text-[11px] text-zinc-500 font-medium pb-1"
                     >
                         {d}
                     </div>
@@ -133,7 +133,7 @@ export function HeatmapCalendar({ sessions, accentColor }: HeatmapCalendarProps)
             </div>
 
             {/* Calendar grid */}
-            <div className="grid grid-cols-7 gap-1.5">
+            <div className="grid grid-cols-7 gap-[5px]">
                 {grid.map((day, i) => (
                     <DayCell
                         key={i}
@@ -145,17 +145,26 @@ export function HeatmapCalendar({ sessions, accentColor }: HeatmapCalendarProps)
                 ))}
             </div>
 
-            {/* Legend */}
-            <div className="flex items-center gap-2 pt-2">
-                <span className="text-[10px] text-zinc-500">Less</span>
-                {intensityColors.map((color, i) => (
-                    <div
-                        key={i}
-                        className="w-4 h-4 rounded-sm"
-                        style={{ backgroundColor: i === 0 ? 'rgba(255,255,255,0.05)' : color }}
-                    />
-                ))}
-                <span className="text-[10px] text-zinc-500">More</span>
+            {/* Legend + total (YPT style) */}
+            <div className="flex items-center justify-between pt-1">
+                <div className="flex items-center gap-1">
+                    {['0+', '4+', '7+', '10+', '12+'].map((label, i) => (
+                        <div key={label} className="flex items-center gap-0.5">
+                            <div
+                                className="w-[18px] h-[14px] rounded-[3px]"
+                                style={{
+                                    backgroundColor: i === 0 ? 'rgba(255,255,255,0.06)' : intensityColors[i],
+                                }}
+                            />
+                            <span className="text-[9px] text-zinc-500 font-medium mr-0.5">
+                                {label}
+                            </span>
+                        </div>
+                    ))}
+                </div>
+                <div className="text-[12px] text-zinc-400 font-medium tabular-nums">
+                    {MONTH_SHORT[month]}: {totalHours}H {remainingMin}M
+                </div>
             </div>
         </div>
     )
