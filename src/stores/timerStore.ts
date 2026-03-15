@@ -334,7 +334,13 @@ export const useTimerStore = create<TimerState>()(
             },
 
             replaceSettings: (settings) => {
-                set({ settings })
+                const { mode, status } = get()
+                const updates: Partial<TimerState> = { settings }
+                // Recalculate timer when idle so synced durations apply
+                if (status === 'idle') {
+                    updates.secondsRemaining = getDurationForMode(mode, settings)
+                }
+                set(updates)
             },
         }),
         {
