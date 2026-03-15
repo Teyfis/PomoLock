@@ -27,7 +27,7 @@ export function Timer() {
     const pomodoroText = completedPomodoros === 1 ? 'Pomodoro' : 'Pomodoros'
 
     return (
-        <div className="min-h-screen bg-[#1A1B24] flex flex-col items-center pt-8 px-4">
+        <div className="min-h-screen bg-[#1C1C1E] flex flex-col items-center pt-8 px-4">
             {/* Header */}
             <header className="w-full max-w-md flex items-center justify-between mb-8">
                 <h1

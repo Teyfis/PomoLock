@@ -47,7 +47,7 @@ export default function DashboardPage() {
     const sessions = buildStatsFromSessions(allSessions)
 
     return (
-        <div className="min-h-screen bg-[#1A1B24] pt-16 px-4 pb-8">
+        <div className="min-h-screen bg-[#1C1C1E] pt-16 px-4 pb-8">
             <div className="max-w-lg mx-auto space-y-6">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -61,7 +61,7 @@ export default function DashboardPage() {
                     </div>
                 </div>
 
-                <div className="bg-zinc-800/30 rounded-xl p-5 border border-zinc-700/30 transform scale-110 origin-top">
+                <div className="transform scale-110 origin-top">
                     <HeatmapCalendar sessions={sessions} accentColor={dashboardAccent} />
                 </div>
             </div>

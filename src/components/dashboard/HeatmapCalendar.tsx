@@ -121,7 +121,7 @@ export function HeatmapCalendar({ sessions, accentColor }: HeatmapCalendarProps)
             />
 
             {/* Week day headers */}
-            <div className="grid grid-cols-7 gap-[5px]">
+            <div className="grid grid-cols-7 gap-0">
                 {WEEK_DAYS.map((d) => (
                     <div
                         key={d}
@@ -133,7 +133,7 @@ export function HeatmapCalendar({ sessions, accentColor }: HeatmapCalendarProps)
             </div>
 
             {/* Calendar grid */}
-            <div className="grid grid-cols-7 gap-[5px]">
+            <div className="grid grid-cols-7 gap-0">
                 {grid.map((day, i) => (
                     <DayCell
                         key={i}
@@ -151,7 +151,7 @@ export function HeatmapCalendar({ sessions, accentColor }: HeatmapCalendarProps)
                     {['0+', '4+', '7+', '10+', '12+'].map((label, i) => (
                         <div key={label} className="flex items-center gap-0.5">
                             <div
-                                className="w-[18px] h-[14px] rounded-[3px]"
+                                className="w-[18px] h-[14px]"
                                 style={{
                                     backgroundColor: i === 0 ? 'rgba(255,255,255,0.06)' : intensityColors[i],
                                 }}
