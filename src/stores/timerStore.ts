@@ -29,6 +29,7 @@ interface TimerState {
 
     // Sync
     pendingSessions: FocusSession[]
+    cloudSessions: FocusSession[]
 
     // Actions
     setMode: (mode: TimerMode) => void
@@ -49,6 +50,7 @@ interface TimerState {
     addPendingSession: (session: FocusSession) => void
     removeSyncedSessions: (ids: string[]) => void
     replaceSettings: (settings: AppSettings) => void
+    setCloudSessions: (sessions: FocusSession[]) => void
 }
 
 // ==========================================
@@ -118,6 +120,7 @@ export const useTimerStore = create<TimerState>()(
 
             // Sync
             pendingSessions: [],
+            cloudSessions: [],
 
             // Actions
             setMode: (mode) => {
@@ -341,6 +344,10 @@ export const useTimerStore = create<TimerState>()(
                     updates.secondsRemaining = getDurationForMode(mode, settings)
                 }
                 set(updates)
+            },
+
+            setCloudSessions: (sessions) => {
+                set({ cloudSessions: sessions })
             },
         }),
         {

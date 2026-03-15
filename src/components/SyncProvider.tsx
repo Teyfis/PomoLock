@@ -3,13 +3,13 @@
 import { useEffect, useRef } from 'react'
 import { useUser } from '@/hooks/useUser'
 import { useTimerStore } from '@/stores/timerStore'
-import { syncOnLogin, pushSettingsToCloud } from '@/lib/syncController'
+import { syncOnLogin, pushSettingsToCloud, fetchCloudSessions } from '@/lib/syncController'
 import type { AppSettings } from '@/types'
 
 /**
  * SyncProvider - handles bidirectional sync between localStorage and Supabase.
  * 
- * On login: pulls cloud settings and pushes pending sessions.
+ * On login: pulls cloud settings, pushes pending sessions, and prefetches cloud sessions.
  * On settings change: pushes settings to cloud (debounced).
  */
 export function SyncProvider() {
@@ -23,7 +23,7 @@ export function SyncProvider() {
         if (!user || hasSyncedRef.current) return
         hasSyncedRef.current = true
 
-        const { settings, pendingSessions, replaceSettings, removeSyncedSessions } = useTimerStore.getState()
+        const { settings, pendingSessions, replaceSettings, removeSyncedSessions, setCloudSessions } = useTimerStore.getState()
 
         syncOnLogin(
             settings,
@@ -34,7 +34,12 @@ export function SyncProvider() {
             (syncedIds) => {
                 removeSyncedSessions(syncedIds)
             },
-        ).catch(console.error)
+        ).then(() => {
+            // After sync, prefetch all cloud sessions for the dashboard
+            return fetchCloudSessions()
+        }).then((sessions) => {
+            setCloudSessions(sessions)
+        }).catch(console.error)
     }, [user])
 
     // Reset sync flag on logout

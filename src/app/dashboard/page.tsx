@@ -1,11 +1,9 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { HeatmapCalendar } from '@/components/dashboard/HeatmapCalendar'
-import { ArrowLeft, Loader2 } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import { useTimerStore } from '@/stores/timerStore'
-import { useUser } from '@/hooks/useUser'
-import { fetchCloudSessions } from '@/lib/syncController'
 import Link from 'next/link'
 import type { DayStats, FocusSession } from '@/types'
 
@@ -13,7 +11,6 @@ function buildStatsFromSessions(sessions: FocusSession[]): DayStats[] {
     const dayMap = new Map<string, DayStats>()
 
     for (const session of sessions) {
-        // Use local date instead of UTC to avoid timezone issues
         const localDate = new Date(session.startedAt)
         const date = `${localDate.getFullYear()}-${String(localDate.getMonth() + 1).padStart(2, '0')}-${String(localDate.getDate()).padStart(2, '0')}`
         const existing = dayMap.get(date) || { date, totalMinutes: 0, sessionCount: 0 }
@@ -28,35 +25,16 @@ function buildStatsFromSessions(sessions: FocusSession[]): DayStats[] {
 export default function DashboardPage() {
     const dashboardAccent = useTimerStore((s) => s.settings.dashboardAccent) || '#8b5cf6'
     const pendingSessions = useTimerStore((s) => s.pendingSessions)
-    const { user } = useUser()
-
-    const [cloudSessions, setCloudSessions] = useState<FocusSession[]>([])
-    const [loading, setLoading] = useState(true)
-
-    // Fetch cloud sessions when user is logged in
-    useEffect(() => {
-        if (user) {
-            setLoading(true)
-            fetchCloudSessions()
-                .then((sessions) => setCloudSessions(sessions))
-                .catch(console.error)
-                .finally(() => setLoading(false))
-        } else {
-            setCloudSessions([])
-            setLoading(false)
-        }
-    }, [user])
+    const cloudSessions = useTimerStore((s) => s.cloudSessions)
 
     // Merge cloud sessions + local pending sessions (deduplicate by id)
     const allSessions = useMemo(() => {
         const sessionMap = new Map<string, FocusSession>()
 
-        // Cloud sessions first (already synced)
         for (const session of cloudSessions) {
             sessionMap.set(session.id, session)
         }
 
-        // Add local pending sessions (not yet synced)
         for (const session of pendingSessions) {
             if (!sessionMap.has(session.id)) {
                 sessionMap.set(session.id, session)
@@ -83,16 +61,9 @@ export default function DashboardPage() {
                     </div>
                 </div>
 
-                {loading ? (
-                    <div className="flex flex-col items-center justify-center py-16 text-center">
-                        <Loader2 className="h-6 w-6 text-zinc-500 animate-spin mb-2" />
-                        <p className="text-zinc-500 text-sm">Loading statistics...</p>
-                    </div>
-                ) : (
-                    <div className="bg-zinc-800/30 rounded-xl p-5 border border-zinc-700/30 transform scale-110 origin-top">
-                        <HeatmapCalendar sessions={sessions} accentColor={dashboardAccent} />
-                    </div>
-                )}
+                <div className="bg-zinc-800/30 rounded-xl p-5 border border-zinc-700/30 transform scale-110 origin-top">
+                    <HeatmapCalendar sessions={sessions} accentColor={dashboardAccent} />
+                </div>
             </div>
         </div>
     )
