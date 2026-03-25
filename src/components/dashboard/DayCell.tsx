@@ -50,11 +50,12 @@ export function DayCell({ day, totalMinutes, isToday, intensityColors }: DayCell
             >
                 {day}
             </span>
-            {timeDisplay && (
-                <span className="text-[12px] text-white/80 tabular-nums leading-tight font-semibold">
-                    {timeDisplay}
-                </span>
-            )}
+            <span className={cn(
+                'text-[12px] tabular-nums leading-tight font-semibold',
+                timeDisplay ? 'text-white/80' : 'invisible'
+            )}>
+                {timeDisplay || '0:00'}
+            </span>
         </div>
     )
 }
