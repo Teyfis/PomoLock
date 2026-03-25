@@ -32,7 +32,7 @@ export function DayCell({ day, totalMinutes, isToday, intensityColors }: DayCell
 
     const intensity = getIntensity(totalMinutes)
     const timeDisplay = formatHoursMinutes(totalMinutes)
-    const bgColor = intensity === 0 ? 'rgba(255,255,255,0.04)' : intensityColors[intensity]
+    const bgColor = intensity === 0 ? 'rgba(255,255,255,0.06)' : intensityColors[intensity]
 
     return (
         <div
@@ -44,14 +44,14 @@ export function DayCell({ day, totalMinutes, isToday, intensityColors }: DayCell
         >
             <span
                 className={cn(
-                    'text-[13px] font-medium tabular-nums leading-tight',
-                    intensity === 0 ? 'text-zinc-500' : 'text-white/85'
+                    'text-[12px] font-medium tabular-nums leading-tight',
+                    intensity === 0 ? 'text-zinc-500' : 'text-white/70'
                 )}
             >
                 {day}
             </span>
             {timeDisplay && (
-                <span className="text-[11px] text-white/65 tabular-nums leading-tight font-medium">
+                <span className="text-[13px] text-white/80 tabular-nums leading-tight font-semibold">
                     {timeDisplay}
                 </span>
             )}
