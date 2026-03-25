@@ -44,7 +44,7 @@ export function DayCell({ day, totalMinutes, isToday, intensityColors }: DayCell
         >
             <span
                 className={cn(
-                    'text-[11px] font-medium tabular-nums leading-tight',
+                    'text-[12px] font-medium tabular-nums leading-tight',
                     intensity === 0 ? 'text-zinc-500' : 'text-white/70'
                 )}
             >
