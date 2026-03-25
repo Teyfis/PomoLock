@@ -47,6 +47,10 @@ export function TimerRunner() {
     const workerRef = useRef<Worker | null>(null)
     const audioRef = useRef<HTMLAudioElement | null>(null)
     const alarmCancelledRef = useRef(false)
+    // Web Audio API context + pre-decoded buffers for background-tab playback
+    const audioCtxRef = useRef<AudioContext | null>(null)
+    const audioBuffersRef = useRef<Record<string, AudioBuffer>>({})
+    const keepAliveRef = useRef<number | null>(null)
 
     // Request notification permission on mount
     useEffect(() => {
@@ -105,23 +109,108 @@ export function TimerRunner() {
         }
     }, [])
 
-    // Helper to play alarm sound
+    // Initialize AudioContext on first user interaction & pre-fetch audio buffers
+    useEffect(() => {
+        const initAudioContext = async () => {
+            if (audioCtxRef.current) return
+            const ctx = new AudioContext()
+            audioCtxRef.current = ctx
+
+            // Pre-fetch and decode audio files
+            for (const file of ['/bip.mp3', '/kazakhstan.mp3']) {
+                try {
+                    const response = await fetch(file)
+                    const arrayBuffer = await response.arrayBuffer()
+                    const audioBuffer = await ctx.decodeAudioData(arrayBuffer)
+                    audioBuffersRef.current[file] = audioBuffer
+                } catch (_) { /* silently ignore if fetch fails */ }
+            }
+        }
+
+        // Initialize on first click/keypress (required by browsers)
+        const handler = () => {
+            initAudioContext()
+            window.removeEventListener('click', handler)
+            window.removeEventListener('keydown', handler)
+        }
+        window.addEventListener('click', handler)
+        window.addEventListener('keydown', handler)
+
+        return () => {
+            window.removeEventListener('click', handler)
+            window.removeEventListener('keydown', handler)
+        }
+    }, [])
+
+    // Keep AudioContext alive when timer is running (prevents browser suspension)
+    useEffect(() => {
+        if ((status === 'running' || status === 'hyperfocus') && audioCtxRef.current) {
+            // Play a silent pulse every 25s to keep AudioContext active
+            const ping = () => {
+                const ctx = audioCtxRef.current
+                if (!ctx || ctx.state === 'closed') return
+                if (ctx.state === 'suspended') ctx.resume()
+                const osc = ctx.createOscillator()
+                const gain = ctx.createGain()
+                gain.gain.value = 0 // silent
+                osc.connect(gain)
+                gain.connect(ctx.destination)
+                osc.start()
+                osc.stop(ctx.currentTime + 0.01)
+            }
+            ping()
+            keepAliveRef.current = window.setInterval(ping, 25000)
+            return () => {
+                if (keepAliveRef.current) clearInterval(keepAliveRef.current)
+            }
+        } else {
+            if (keepAliveRef.current) {
+                clearInterval(keepAliveRef.current)
+                keepAliveRef.current = null
+            }
+        }
+    }, [status])
+
+    // Helper to play alarm sound (Web Audio API — works in background tabs)
     const playAlarm = (settings: { alarmSound: string; soundVolume: number; alarmRepeatCount: number }) => {
         try {
             const repeat = settings.alarmRepeatCount || 3
             const soundFile = settings.alarmSound === 'kazakhstan' ? '/kazakhstan.mp3' : '/bip.mp3'
             alarmCancelledRef.current = false
 
+            const ctx = audioCtxRef.current
+            const buffer = audioBuffersRef.current[soundFile]
+
+            // Fallback to HTML Audio if Web Audio API isn't available
+            if (!ctx || !buffer) {
+                const playOnce = (index: number) => {
+                    if (index >= repeat || alarmCancelledRef.current) return
+                    const audio = new Audio(soundFile)
+                    audio.volume = settings.soundVolume
+                    audioRef.current = audio
+                    audio.play().catch(() => {})
+                    audio.onended = () => {
+                        audioRef.current = null
+                        playOnce(index + 1)
+                    }
+                }
+                playOnce(0)
+                return
+            }
+
+            // Resume context if suspended
+            if (ctx.state === 'suspended') ctx.resume()
+
             const playOnce = (index: number) => {
                 if (index >= repeat || alarmCancelledRef.current) return
-                const audio = new Audio(soundFile)
-                audio.volume = settings.soundVolume
-                audioRef.current = audio
-                audio.play().catch(() => { /* AbortError is expected when interrupted */ })
-                audio.onended = () => {
-                    audioRef.current = null
-                    playOnce(index + 1)
-                }
+                const source = ctx.createBufferSource()
+                const gainNode = ctx.createGain()
+                source.buffer = buffer
+                gainNode.gain.value = settings.soundVolume
+                source.connect(gainNode)
+                gainNode.connect(ctx.destination)
+                source.onended = () => playOnce(index + 1)
+                source.start()
             }
             playOnce(0)
         } catch (e) {
