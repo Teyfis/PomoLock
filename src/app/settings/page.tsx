@@ -56,7 +56,7 @@ export default function SettingsPage() {
     }
 
     return (
-        <div className="min-h-screen bg-[#1C1C1E] pt-16 pb-16 px-4">
+        <div className="min-h-screen bg-[#1A1B24] pt-16 pb-16 px-4">
             <div className="max-w-lg mx-auto space-y-8">
                 {/* Header */}
                 <div className="flex items-center gap-3">

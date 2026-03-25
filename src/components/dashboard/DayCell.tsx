@@ -27,7 +27,7 @@ function getIntensity(totalMinutes: number): number {
 
 export function DayCell({ day, totalMinutes, isToday, intensityColors }: DayCellProps) {
     if (day === null) {
-        return <div className="h-[60px]" />
+        return <div className="h-[58px]" />
     }
 
     const intensity = getIntensity(totalMinutes)
@@ -37,21 +37,21 @@ export function DayCell({ day, totalMinutes, isToday, intensityColors }: DayCell
     return (
         <div
             className={cn(
-                'h-[60px] flex flex-col items-center justify-center gap-0.5 transition-colors duration-200',
+                'h-[58px] rounded-[4px] flex flex-col items-center justify-center gap-0.5 transition-colors duration-200',
                 isToday && 'ring-[1.5px] ring-white/60'
             )}
-            style={{ backgroundColor: intensity === 0 ? 'transparent' : bgColor }}
+            style={{ backgroundColor: bgColor }}
         >
             <span
                 className={cn(
-                    'text-[15px] font-medium tabular-nums leading-tight',
+                    'text-[13px] font-medium tabular-nums leading-tight',
                     intensity === 0 ? 'text-zinc-500' : 'text-white/85'
                 )}
             >
                 {day}
             </span>
             {timeDisplay && (
-                <span className="text-[17px] text-white/70 tabular-nums leading-tight font-semibold">
+                <span className="text-[11px] text-white/65 tabular-nums leading-tight font-medium">
                     {timeDisplay}
                 </span>
             )}

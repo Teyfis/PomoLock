@@ -50,7 +50,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${rubik.variable} antialiased bg-[#1C1C1E]`}
+        className={`${geistSans.variable} ${geistMono.variable} ${rubik.variable} antialiased bg-[#1A1B24]`}
       >
         <TimerRunner />
         <SyncProvider />
