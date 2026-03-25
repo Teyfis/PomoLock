@@ -85,9 +85,9 @@ export type HeatmapIntensity = 0 | 1 | 2 | 3 | 4
 export function getHeatmapIntensity(totalMinutes: number): HeatmapIntensity {
     const hours = totalMinutes / 60
     if (hours === 0) return 0
-    if (hours < 4) return 1
-    if (hours < 7) return 2
-    if (hours < 10) return 3
+    if (hours < 2) return 1
+    if (hours < 4) return 2
+    if (hours < 6) return 3
     return 4
 }
 

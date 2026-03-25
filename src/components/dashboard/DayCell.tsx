@@ -18,9 +18,9 @@ function formatHoursMinutes(totalMinutes: number): string {
 
 function getIntensity(totalMinutes: number): number {
     const hours = totalMinutes / 60
-    if (hours >= 12) return 4
-    if (hours >= 7) return 3
-    if (hours >= 4) return 2
+    if (hours >= 10) return 4
+    if (hours >= 6) return 3
+    if (hours >= 2) return 2
     if (hours > 0) return 1
     return 0
 }

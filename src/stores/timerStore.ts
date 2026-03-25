@@ -8,6 +8,14 @@ import {
     DEFAULT_SETTINGS,
 } from '@/types'
 
+// Unique ID generator that works in both browser and test environments
+function generateId(): string {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+        return crypto.randomUUID()
+    }
+    return `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`
+}
+
 // ==========================================
 // Timer Store Types
 // ==========================================
@@ -174,7 +182,7 @@ export const useTimerStore = create<TimerState>()(
                         const session: FocusSession = {
                             id: crypto.randomUUID(),
                             userId: '',
-                            startedAt: now,
+                            startedAt: sessionStartedAt,
                             durationMinutes: elapsedMinutes,
                             actualDurationSeconds: elapsedSeconds,
                             hyperfocusSeconds: hyperfocusSeconds,
@@ -210,7 +218,7 @@ export const useTimerStore = create<TimerState>()(
                     const session: FocusSession = {
                         id: crypto.randomUUID(),
                         userId: '',
-                        startedAt: now,
+                        startedAt: sessionStartedAt,
                         durationMinutes: Math.floor(totalSeconds / 60),
                         actualDurationSeconds: totalSeconds,
                         hyperfocusSeconds: hyperfocusSeconds,
@@ -262,7 +270,7 @@ export const useTimerStore = create<TimerState>()(
                     const session: FocusSession = {
                         id: crypto.randomUUID(),
                         userId: '',
-                        startedAt: now,
+                        startedAt: sessionStartedAt,
                         durationMinutes: Math.floor(totalSeconds / 60),
                         actualDurationSeconds: totalSeconds,
                         hyperfocusSeconds: hyperfocusSeconds,
@@ -356,12 +364,14 @@ export const useTimerStore = create<TimerState>()(
             partialize: (state) => ({
                 settings: state.settings,
                 completedPomodoros: state.completedPomodoros,
+                lastPomodoroDate: state.lastPomodoroDate,
                 hyperfocusEnabled: state.hyperfocusEnabled,
                 mode: state.mode,
                 status: state.status,
                 secondsRemaining: state.secondsRemaining,
                 hyperfocusSeconds: state.hyperfocusSeconds,
                 pausedFromHyperfocus: state.pausedFromHyperfocus,
+                sessionStartedAt: state.sessionStartedAt,
                 pendingSessions: state.pendingSessions,
             }),
             // Deep merge to handle new settings fields (e.g. dashboardAccent)
@@ -380,6 +390,47 @@ export const useTimerStore = create<TimerState>()(
                         },
                     }
                 }
+
+                // Recover stale sessions: if there's an active focus session
+                // from a previous day, auto-save the partial progress and reset
+                if (
+                    merged.mode === 'focus' &&
+                    (merged.status === 'running' || merged.status === 'paused' || merged.status === 'hyperfocus') &&
+                    merged.sessionStartedAt
+                ) {
+                    const sessionDate = new Date(merged.sessionStartedAt)
+                    const sessionDay = `${sessionDate.getFullYear()}-${String(sessionDate.getMonth() + 1).padStart(2, '0')}-${String(sessionDate.getDate()).padStart(2, '0')}`
+                    const today = getLocalDateString()
+
+                    if (sessionDay !== today) {
+                        const totalSeconds = getDurationForMode('focus', merged.settings)
+                        const elapsedSeconds = totalSeconds - merged.secondsRemaining + (merged.hyperfocusSeconds || 0)
+                        const elapsedMinutes = Math.floor(elapsedSeconds / 60)
+
+                        // Only save if at least 1 minute was studied
+                        if (elapsedMinutes >= 1) {
+                            const session: FocusSession = {
+                                id: generateId(),
+                                userId: '',
+                                startedAt: merged.sessionStartedAt,
+                                durationMinutes: elapsedMinutes,
+                                actualDurationSeconds: elapsedSeconds,
+                                hyperfocusSeconds: merged.hyperfocusSeconds || 0,
+                                completed: false,
+                                createdAt: new Date().toISOString(),
+                            }
+                            merged.pendingSessions = [...(merged.pendingSessions || []), session]
+                        }
+
+                        // Reset timer to idle
+                        merged.status = 'idle'
+                        merged.secondsRemaining = getDurationForMode('focus', merged.settings)
+                        merged.hyperfocusSeconds = 0
+                        merged.sessionStartedAt = null
+                        merged.pausedFromHyperfocus = false
+                    }
+                }
+
                 return merged
             },
         }

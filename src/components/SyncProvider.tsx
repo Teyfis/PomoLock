@@ -3,20 +3,22 @@
 import { useEffect, useRef } from 'react'
 import { useUser } from '@/hooks/useUser'
 import { useTimerStore } from '@/stores/timerStore'
-import { syncOnLogin, pushSettingsToCloud, fetchCloudSessions } from '@/lib/syncController'
-import type { AppSettings } from '@/types'
+import { syncOnLogin, pushSettingsToCloud, pushPendingSessions, fetchCloudSessions } from '@/lib/syncController'
 
 /**
  * SyncProvider - handles bidirectional sync between localStorage and Supabase.
  * 
  * On login: pulls cloud settings, pushes pending sessions, and prefetches cloud sessions.
+ * On session complete: pushes new sessions to cloud immediately (debounced).
  * On settings change: pushes settings to cloud (debounced).
  */
 export function SyncProvider() {
     const { user } = useUser()
     const hasSyncedRef = useRef(false)
     const debounceRef = useRef<NodeJS.Timeout | null>(null)
+    const sessionDebounceRef = useRef<NodeJS.Timeout | null>(null)
     const prevSettingsRef = useRef<string>('')
+    const prevPendingCountRef = useRef<number>(0)
 
     // Sync on login
     useEffect(() => {
@@ -24,6 +26,7 @@ export function SyncProvider() {
         hasSyncedRef.current = true
 
         const { settings, pendingSessions, replaceSettings, removeSyncedSessions, setCloudSessions } = useTimerStore.getState()
+        prevPendingCountRef.current = pendingSessions.length
 
         syncOnLogin(
             settings,
@@ -39,6 +42,8 @@ export function SyncProvider() {
             return fetchCloudSessions()
         }).then((sessions) => {
             setCloudSessions(sessions)
+            // Update count after initial sync
+            prevPendingCountRef.current = useTimerStore.getState().pendingSessions.length
         }).catch(console.error)
     }, [user])
 
@@ -46,6 +51,49 @@ export function SyncProvider() {
     useEffect(() => {
         if (!user) {
             hasSyncedRef.current = false
+        }
+    }, [user])
+
+    // Push new sessions to cloud in real-time (debounced)
+    useEffect(() => {
+        if (!user) return
+
+        const unsub = useTimerStore.subscribe((state) => {
+            const currentCount = state.pendingSessions.length
+
+            // Only trigger when new sessions are added (count increased)
+            if (currentCount > prevPendingCountRef.current) {
+                prevPendingCountRef.current = currentCount
+
+                // Debounce to batch rapid session additions
+                if (sessionDebounceRef.current) clearTimeout(sessionDebounceRef.current)
+                sessionDebounceRef.current = setTimeout(async () => {
+                    try {
+                        const { pendingSessions, removeSyncedSessions, cloudSessions, setCloudSessions } = useTimerStore.getState()
+                        if (pendingSessions.length === 0) return
+
+                        const syncedIds = await pushPendingSessions(pendingSessions)
+                        if (syncedIds.length > 0) {
+                            // Get the sessions that were just synced to add to cloudSessions
+                            const syncedSessions = pendingSessions.filter(s => syncedIds.includes(s.id))
+                            removeSyncedSessions(syncedIds)
+                            // Update cloudSessions so dashboard reflects them immediately
+                            setCloudSessions([...cloudSessions, ...syncedSessions])
+                            prevPendingCountRef.current = useTimerStore.getState().pendingSessions.length
+                        }
+                    } catch (err) {
+                        console.error('Failed to push sessions to cloud:', err)
+                    }
+                }, 1000) // Wait 1 second to batch
+            } else {
+                // Count decreased (sessions were removed after sync), update ref
+                prevPendingCountRef.current = currentCount
+            }
+        })
+
+        return () => {
+            unsub()
+            if (sessionDebounceRef.current) clearTimeout(sessionDebounceRef.current)
         }
     }, [user])
 

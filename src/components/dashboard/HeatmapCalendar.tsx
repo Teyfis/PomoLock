@@ -148,7 +148,7 @@ export function HeatmapCalendar({ sessions, accentColor }: HeatmapCalendarProps)
             {/* Legend + total (YPT style) */}
             <div className="flex items-center justify-between pt-1">
                 <div className="flex items-center gap-1">
-                    {['0+', '4+', '7+', '10+', '12+'].map((label, i) => (
+                    {['0+', '2+', '4+', '6+', '10+'].map((label, i) => (
                         <div key={label} className="flex items-center gap-0.5">
                             <div
                                 className="w-[18px] h-[14px]"
