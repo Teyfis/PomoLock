@@ -101,10 +101,10 @@ export function HeatmapCalendar({ sessions, accentColor }: HeatmapCalendarProps)
 
     const intensityColors = useMemo(() => [
         'transparent',
-        hexToRgba(accentColor, 0.12),
-        hexToRgba(accentColor, 0.20),
-        hexToRgba(accentColor, 0.32),
-        hexToRgba(accentColor, 0.48),
+        hexToRgba(accentColor, 0.15),
+        hexToRgba(accentColor, 0.30),
+        hexToRgba(accentColor, 0.50),
+        hexToRgba(accentColor, 0.70),
     ], [accentColor])
 
     const totalHours = Math.floor(totalMinutes / 60)
