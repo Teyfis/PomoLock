@@ -212,17 +212,18 @@ export const useTimerStore = create<TimerState>()(
 
                 // Save full session if skipping a focus mode
                 if (mode === 'focus' && sessionStartedAt) {
-                    const { hyperfocusSeconds } = get()
+                    const { hyperfocusSeconds, secondsRemaining } = get()
                     const now = new Date().toISOString()
-                    const totalSeconds = settings.focusDuration * 60 + hyperfocusSeconds
+                    const totalDuration = settings.focusDuration * 60
+                    const elapsedSeconds = totalDuration - secondsRemaining + hyperfocusSeconds
                     const session: FocusSession = {
                         id: crypto.randomUUID(),
                         userId: '',
                         startedAt: sessionStartedAt,
-                        durationMinutes: Math.floor(totalSeconds / 60),
-                        actualDurationSeconds: totalSeconds,
+                        durationMinutes: Math.floor(elapsedSeconds / 60),
+                        actualDurationSeconds: elapsedSeconds,
                         hyperfocusSeconds: hyperfocusSeconds,
-                        completed: true,
+                        completed: false,
                         createdAt: now,
                     }
                     const { pendingSessions } = get()
