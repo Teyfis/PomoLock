@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useCallback } from 'react'
 import { useTimer } from '@/hooks/useTimer'
 import { ModeSelector } from './ModeSelector'
 import { TimerDisplay } from './TimerDisplay'
@@ -23,6 +24,27 @@ export function Timer() {
         skip,
         toggleHyperfocus,
     } = useTimer()
+
+    // Spacebar shortcut: start / pause
+    const handleKeyDown = useCallback(
+        (e: KeyboardEvent) => {
+            if (e.code !== 'Space') return
+            const tag = (e.target as HTMLElement)?.tagName
+            if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
+            e.preventDefault()
+            if (status === 'running' || status === 'hyperfocus') {
+                pause()
+            } else {
+                start()
+            }
+        },
+        [status, start, pause],
+    )
+
+    useEffect(() => {
+        window.addEventListener('keydown', handleKeyDown)
+        return () => window.removeEventListener('keydown', handleKeyDown)
+    }, [handleKeyDown])
 
     const pomodoroText = completedPomodoros === 1 ? 'Pomodoro' : 'Pomodoros'
 
